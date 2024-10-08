@@ -49,6 +49,8 @@ protected:
 
 	bool								idleEmpty;
 
+	idList<rvPair<idEntityPtr<idEntity>, idMat3>>		normalEnts;
+
 private:
 
 	stateResult_t		State_Idle				( const stateParms_t& parms );
@@ -132,6 +134,8 @@ void rvWeaponRocketLauncher::Spawn ( void ) {
 	SetRocketState ( "Rocket_Idle", 0 );
 }
 
+float rotation = 0.5f;
+
 /*
 ================
 rvWeaponRocketLauncher::Think
@@ -148,6 +152,41 @@ void rvWeaponRocketLauncher::Think ( void ) {
 
 	// IF no guide range is set then we dont have the mod yet	
 	if ( !guideRange ) {
+		for (i = normalEnts.Num() - 1; i >= 0; i--) {
+			idProjectile* proj = static_cast<idProjectile*>(normalEnts[i].First().GetEntity());
+			idMat3 axis = normalEnts[i].Second();
+			if (!proj || proj->IsHidden()) {
+				continue;
+			}
+
+			float currentRotation = rotation + (1.570795f * (i % 4));
+			
+
+			idVec3 dir = axis[0] + axis[2] * (idMath::Sin(0.1f) * idMath::Sin(currentRotation)) - axis[1] * (idMath::Sin(0.1f) * idMath::Cos(currentRotation));
+			dir.Normalize();
+
+			proj->GetPhysics()->SetLinearVelocity(dir * proj->GetSpeed());
+		}
+
+		// remove projectiles whenever all 4 in the group are dead cause otherwise the indexes get messed up
+		for (i = 0; i < normalEnts.Num()/4; i++) {
+			int deadprojs = 0;
+			for (int j = 0; j < 4; j++) {
+				idProjectile* proj = static_cast<idProjectile*>(normalEnts[(i * 4) + j].First().GetEntity());
+				if (!proj || proj->IsHidden()) {
+					deadprojs++;
+				}
+			}
+
+			if (deadprojs == 4) {
+				for (int j = 0; j < 4; j++) {
+					normalEnts.RemoveIndex((i * 4) + j);
+				}
+			}
+		}
+
+		rotation += 0.025f;
+
 		return;
 	}
 	
@@ -212,6 +251,11 @@ rvWeaponRocketLauncher::OnLaunchProjectile
 */
 void rvWeaponRocketLauncher::OnLaunchProjectile ( idProjectile* proj ) {
 	rvWeapon::OnLaunchProjectile(proj);
+
+	// Launch the projectile
+	idEntityPtr<idEntity> ptr1;
+	ptr1 = proj;
+    normalEnts.Append(rvPair<idEntityPtr<idEntity>, idMat3>(ptr1, owner->firstPersonViewAxis));
 
 	// Double check that its actually a guided projectile
 	if ( !proj || !proj->IsType ( idGuidedProjectile::GetClassType() ) ) {
@@ -446,7 +490,7 @@ stateResult_t rvWeaponRocketLauncher::State_Fire ( const stateParms_t& parms ) {
 	switch ( parms.stage ) {
 		case STAGE_INIT:
 			nextAttackTime = gameLocal.time + (fireRate * owner->PowerUpModifier ( PMOD_FIRERATE ));		
-			Attack ( false, 1, spread, 0, 1.0f );
+			Attack ( false, 4, spread, 0, 1.0f );
 			PlayAnim ( ANIMCHANNEL_LEGS, "fire", parms.blendFrames );	
 			return SRESULT_STAGE ( STAGE_WAIT );
 	

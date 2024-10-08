@@ -730,7 +730,7 @@ ID_INLINE int idList<type>::Append( type const & obj ) {
 		Resize( newsize - newsize % granularity );
 	}
 
-	list[ num ] = obj;
+	list[ num ] = const_cast<type&>(obj);
 	num++;
 
 	return num - 1;
