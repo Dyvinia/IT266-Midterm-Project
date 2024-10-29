@@ -7485,8 +7485,8 @@ void idPlayer::CrashLand( const idVec3 &oldOrigin, const idVec3 &oldVelocity ) {
 		}
 	}
 
-	//jshepard: no falling damage if falling damage is disabled
-	if( pfl.noFallingDamage )	{
+	// completely disable fall damage 
+	if( true )	{
 		return;
 	}
 
