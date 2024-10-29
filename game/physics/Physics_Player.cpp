@@ -1654,6 +1654,15 @@ bool idPhysics_Player::OnLadder( void ) const {
 
 /*
 ================
+idPhysics_Player::IsWalking
+================
+*/
+bool idPhysics_Player::IsWalking(void) const {
+	return walking;
+}
+
+/*
+================
 idPhysics_Player::idPhysics_Player
 ================
 */

@@ -77,6 +77,7 @@ public:
 	float					GetStepUp( void ) const;
 	bool					IsCrouching( void ) const;
 	bool					OnLadder( void ) const;
+	bool					IsWalking( void ) const;
 	const idVec3 &			PlayerGetOrigin( void ) const;	// != GetOrigin
 
 public:	// common physics interface
