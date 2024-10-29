@@ -814,6 +814,9 @@ private:
 
 	int						bobFoot;
 	float					bobFrac;
+	bool					attackIntent;
+	bool					isSprinting;
+	float					sprintFrac;
 	float					bobfracsin;
 	int						bobCycle;			// for view bobbing and footstep generation
 	float					xyspeed;

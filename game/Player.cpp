@@ -1153,6 +1153,9 @@ idPlayer::idPlayer() {
 
 	bobFoot					= 0;
 	bobFrac					= 0.0f;
+	attackIntent			= false;
+	isSprinting				= false;
+	sprintFrac				= 0.0f;
 	bobfracsin				= 0.0f;
 	bobCycle				= 0;
 	xyspeed					= 0.0f;
@@ -1515,7 +1518,8 @@ void idPlayer::Init( void ) {
 	oldInventoryWeapons		= 0;
 
 	lastDmgTime				= 0;
-	
+	isSprinting				= false;
+	sprintFrac				= 0.0f;
 	bobCycle				= 0;
 	bobFrac					= 0.0f;
 	landChange				= 0;
@@ -6110,8 +6114,10 @@ void idPlayer::Weapon_Combat( void ) {
  	if ( !influenceActive ) {
  		if ( ( usercmd.buttons & BUTTON_ATTACK ) && !weaponGone ) {
  			FireWeapon();
+			attackIntent = true;
  		} else if ( oldButtons & BUTTON_ATTACK ) {
  			pfl.attackHeld = false;
+			attackIntent = false;
  			weapon->EndAttack();
  		}
  	}
@@ -8737,17 +8743,30 @@ idPlayer::AdjustSpeed
 */
 void idPlayer::AdjustSpeed( void ) {
 	float speed;
-
+	isSprinting = false;
 	if ( spectating ) {
 		speed = pm_spectatespeed.GetFloat();
 		bobFrac = 0.0f;
 	} else if ( noclip ) {
 		speed = pm_noclipspeed.GetFloat();
 		bobFrac = 0.0f;
- 	} else if ( !physicsObj.OnLadder() && ( usercmd.buttons & BUTTON_RUN ) && ( usercmd.forwardmove || usercmd.rightmove ) && ( usercmd.upmove >= 0 ) ) {
+	}
+	else if (!physicsObj.OnLadder() && !(usercmd.buttons & BUTTON_RUN) && (usercmd.forwardmove > 0) && (usercmd.upmove >= 0)) {
+		if (attackIntent && zoomed) {
+			bobFrac = 1.0f;
+			speed = pm_speed.GetFloat();
+		}
+		else {
+			speed = pm_sprintspeed.GetFloat();
+			bobFrac = 1.75f;
+			isSprinting = true;
+		}
+	}
+	else if (!physicsObj.OnLadder() && (usercmd.buttons & BUTTON_RUN) && (usercmd.forwardmove || usercmd.rightmove) && (usercmd.upmove >= 0)) {
 		bobFrac = 1.0f;
 		speed = pm_speed.GetFloat();
-	} else {
+	}
+	else {
 		speed = pm_walkspeed.GetFloat();
 		bobFrac = 0.0f;
 	}
@@ -9303,6 +9322,27 @@ void idPlayer::Think( void ) {
 	if ( !gameLocal.usercmds ) {
 		return;
 	}
+
+	
+	// slowly interpolate into sprinting stance
+	if (isSprinting) {
+		if (sprintFrac < 1.0f) {
+			sprintFrac += 0.075f;
+		}
+	}
+
+	// slightly less slowly interpolate out of sprinting stance
+	else {
+		if (sprintFrac > 0.0f) {
+			sprintFrac -= 0.125f;
+		}
+	}
+
+	// quickly slowly interpolate out of sprinting stance
+	if (attackIntent && sprintFrac > 0.0f) {
+		sprintFrac -= 0.25f;
+	}
+	
 
 #ifdef _XENON
 	// change the crosshair if it's modified
@@ -10624,6 +10664,13 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 	angles.roll		= scale * bobfracsin * 0.005f + g_gun_roll.GetFloat();
 	angles.yaw		= scale * bobfracsin * 0.01f + g_gun_yaw.GetFloat();
 	angles.pitch	= xyspeed * bobfracsin * 0.005f + g_gun_pitch.GetFloat();
+
+	// bring down gun when sprinting
+	if (sprintFrac > 0.0f) {
+		angles.roll += -10.0f * sprintFrac;
+		angles.yaw += 20.0f * sprintFrac;
+		angles.pitch += 15.0f * sprintFrac;
+	}
 	
 	angles += weapon->GetViewModelAngles();
 
