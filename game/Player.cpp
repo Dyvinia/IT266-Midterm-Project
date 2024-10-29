@@ -1154,6 +1154,8 @@ idPlayer::idPlayer() {
 	bobFoot					= 0;
 	bobFrac					= 0.0f;
 	attackIntent			= false;
+	wasCrouching			= false;
+	isSliding				= false;
 	isSprinting				= false;
 	sprintFrac				= 0.0f;
 	bobfracsin				= 0.0f;
@@ -9083,6 +9085,32 @@ void idPlayer::Move( void ) {
  			physicsObj.SetLinearVelocity( vel );
  		}
 	}
+
+	if (pfl.crouch && !wasCrouching) {
+		idVec3 vel = physicsObj.GetLinearVelocity();
+		float speed = vel.ToVec2().Length();
+		if (speed > 200.0f) {
+			vel.z = abs(vel.z) * -1.0f; // sliding shouldnt give a boost upwards
+			float speedMult = 3.0f * speed / 200.0f; // the faster you move while going into the slide, the faster the slide is
+			physicsObj.SetLinearVelocity(vel * speedMult);
+			isSliding = true;
+		}
+	}
+
+	// if stopped crouching while sliding, stop sliding
+	if (isSliding && !pfl.crouch) {
+		isSliding = false;
+	}
+
+	// sliding has reduced friction
+	if (isSliding) {
+		pm_frictionoverride.SetFloat(3.0f);
+	}
+	else {
+		pm_frictionoverride.SetFloat(-1.0f);
+	}
+
+	wasCrouching = pfl.crouch;
 
 	if ( pfl.jump ) {
 		loggedAccel_t	*acc = &loggedAccel[currentLoggedAccel&(NUM_LOGGED_ACCELS-1)];

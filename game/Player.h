@@ -815,6 +815,8 @@ private:
 	int						bobFoot;
 	float					bobFrac;
 	bool					attackIntent;
+	bool					wasCrouching;
+	bool					isSliding;
 	bool					isSprinting;
 	float					sprintFrac;
 	float					bobfracsin;
