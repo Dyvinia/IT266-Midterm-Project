@@ -636,6 +636,7 @@ void rvWeapon::Spawn ( void ) {
 	zoomGui  = uiManager->FindGui ( spawnArgs.GetString ( "gui_zoom", "" ), true );
 	zoomTime = spawnArgs.GetFloat ( "zoomTime", ".15" );
 	wfl.zoomHideCrosshair = spawnArgs.GetBool ( "zoomHideCrosshair", "1" );
+	zoomSpeedMult = spawnArgs.GetFloat("zoomSpeedMult", ".5");
 
 	// Attack related values
 	muzzle_kick_time	= SEC2MS( spawnArgs.GetFloat( "muzzle_kick_time" ) );

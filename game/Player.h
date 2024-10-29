@@ -280,6 +280,17 @@ public:
  		EVENT_MAXEVENTS
  	};
 
+	enum Legend {
+		LEGEND_HORIZON,
+		LEGEND_OCTANE,
+		LEGEND_VALKYRIE
+	};
+
+	Legend					legend;
+
+	int						tacRefreshTime;
+	int						tacDurationTime;
+
 	friend class idThread;
 
 	usercmd_t				usercmd;
@@ -303,6 +314,11 @@ public:
 
 	int						lastHitTime;			// last time projectile fired by player hit target
 	int						lastSavingThrowTime;	// for the "free miss" effect
+
+	float					speedMult;
+	float					fovMult;
+	idVec3					defaultSprintWeaponStance;
+	idVec3					sprintWeaponStance;
 
 	struct playerFlags_s {
 		bool		forward			:1;
@@ -511,6 +527,7 @@ public:
 	void					WeaponFireFeedback( const idDict *weaponDef );
 
  	float					DefaultFov( void ) const;
+	idVec3					DefaultSprintStance( void ) const;
  	float					CalcFov( bool honorZoom );
 	void					CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis );
 	void					GetViewPos( idVec3 &origin, idMat3 &axis ) const;
@@ -795,6 +812,10 @@ public:
 	void					SetCash( float newCashAmount );
 	void					ResetCash();
 // RITUAL END
+
+	void					DoPassiveAbility(void);
+	void					TacticalAbility(void);
+	void					EndTacticalAbility(void);
 
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );

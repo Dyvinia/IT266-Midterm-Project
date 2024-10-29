@@ -1084,6 +1084,7 @@ idPlayer::idPlayer() {
 	doInitWeapon			= false;
 	noclip					= false;
 	godmode					= false;
+	legend					= LEGEND_OCTANE;
 	undying					= g_forceUndying.GetBool() ? !gameLocal.isMultiplayer : false;
 
 	spawnAnglesSet			= false;
@@ -1153,11 +1154,16 @@ idPlayer::idPlayer() {
 
 	bobFoot					= 0;
 	bobFrac					= 0.0f;
+	speedMult				= 1.0f;
+	fovMult					= 1.0f;
+	tacRefreshTime			= -1;
+	tacDurationTime			= -1;
 	attackIntent			= false;
 	wasCrouching			= false;
 	isSliding				= false;
 	isSprinting				= false;
 	sprintFrac				= 0.0f;
+	sprintWeaponStance		= DefaultSprintStance();
 	bobfracsin				= 0.0f;
 	bobCycle				= 0;
 	xyspeed					= 0.0f;
@@ -3960,6 +3966,68 @@ void idPlayer::StopFiring( void ) {
 	if ( weapon ) {
 		weapon->EndAttack();
 	}
+}
+
+/*
+===============
+idPlayer::DoPassiveAbility
+===============
+*/
+void idPlayer::DoPassiveAbility(void) {
+	if (legend == LEGEND_OCTANE) {
+		if (gameLocal.time % 1000 == 0) {
+			if (health <= inventory.maxHealth) {
+				health += 1;
+			}
+		}
+	}
+}
+
+/*
+===============
+idPlayer::TacticalAbility
+===============
+*/
+void idPlayer::TacticalAbility(void) {
+	if (gameLocal.time < tacRefreshTime) {
+		return;
+	}
+
+	int duration = 0;
+	int cooldown = 0;
+
+	if (legend == LEGEND_OCTANE) {
+		duration = 5;
+		cooldown = 1;
+		speedMult = 1.4f;
+		fovMult = 1.1f;
+		//sprintWeaponStance = idVec3::idVec3(0.0f, -40.0f, 0.0f);
+
+		if (health <= 20) {
+			health = 1;
+		}
+		else {
+			health -= 20;
+		}
+	}
+
+	tacDurationTime = gameLocal.time + (duration * 1000);
+	tacRefreshTime = tacDurationTime + (cooldown * 1000);
+}
+
+/*
+===============
+idPlayer::EndTacticalAbility
+===============
+*/
+void idPlayer::EndTacticalAbility(void) {
+	if (legend == LEGEND_OCTANE) {
+		speedMult = 1.0f;
+		fovMult = 1.0f;
+		//sprintWeaponStance = DefaultSprintStance();
+	}
+
+	tacDurationTime = -1;
 }
 
 /*
@@ -8777,6 +8845,12 @@ void idPlayer::AdjustSpeed( void ) {
 		bobFrac = 0.0f;
 	}
 
+	if (zoomed) {
+		speed *= weapon->zoomSpeedMult;
+	}
+
+	speed *= speedMult;
+
 	speed *= PowerUpModifier(PMOD_SPEED);
 
 	if ( influenceActive == INFLUENCE_LEVEL3 ) {
@@ -9361,6 +9435,11 @@ void idPlayer::Think( void ) {
 		return;
 	}
 
+	DoPassiveAbility();
+
+	if (gameLocal.time > tacDurationTime) {
+		EndTacticalAbility();
+	}
 	
 	// slowly interpolate into sprinting stance
 	if (isSprinting) {
@@ -10527,6 +10606,15 @@ float idPlayer::DefaultFov( void ) const {
 
 /*
 ====================
+idPlayer::DefaultSprintStance
+====================
+*/
+idVec3 idPlayer::DefaultSprintStance(void) const {
+	return idVec3::idVec3(20.0f, 15.0f, -10.0f);
+}
+
+/*
+====================
 idPlayer::CalcFov
 
 Fixed fov at intermissions, otherwise account for fov variable and zooms.
@@ -10560,6 +10648,8 @@ float idPlayer::CalcFov( bool honorZoom ) {
 			fov = zoomFov.GetCurrentValue( gameLocal.time );
 		}
 	}
+
+	fov *= fovMult;
 
 	// bound normal viewsize
 	if ( fov < 1 ) {
@@ -10703,11 +10793,11 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 	angles.yaw		= scale * bobfracsin * 0.01f + g_gun_yaw.GetFloat();
 	angles.pitch	= xyspeed * bobfracsin * 0.005f + g_gun_pitch.GetFloat();
 
-	// bring down gun when sprinting
+	// gradually switch to sprint stance
 	if (sprintFrac > 0.0f) {
-		angles.roll += -10.0f * sprintFrac;
-		angles.yaw += 20.0f * sprintFrac;
-		angles.pitch += 15.0f * sprintFrac;
+		angles.yaw += sprintWeaponStance.x * sprintFrac;
+		angles.pitch += sprintWeaponStance.y * sprintFrac;
+		angles.roll += sprintWeaponStance.z * sprintFrac;
 	}
 	
 	angles += weapon->GetViewModelAngles();

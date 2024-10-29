@@ -351,6 +351,8 @@ public:
 	idUserInterface*				zoomGui;				// whether or not to overlay a zoom scope
 	float							zoomTime;				// time it takes to zoom in
 
+	float							zoomSpeedMult;
+
 	// lights
 	renderLight_t					lights[WPLIGHT_MAX];
 	int								lightHandles[WPLIGHT_MAX];
