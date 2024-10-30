@@ -643,12 +643,12 @@ windowDef Desktop
 		}
 		windowDef d_health_amount
 		{
-			rect	254,427,58,31
+			rect	354,427,58,31
 			visible	0
 		}
 		windowDef health_amount
 		{
-			rect	256,429,52,26
+			rect	356,429,52,26
 			visible	1
 			forecolor	0.866,0.921,0.764,1
 			text	"gui::player_health"
@@ -723,6 +723,33 @@ windowDef Desktop
 			visible	1
 			forecolor	0.839,0.894,0.737,1
 			text	"gui::player_tac_text"
+			textscale	0.4
+			font	"fonts/chain"
+			shear	0,-.22
+			textalign	1
+			notime	1
+		}
+		windowDef ult_backbar
+		{
+			rect	244,420,50,50
+			visible	1
+			background	"gfx/guis/hud/backbar"
+			matcolor	0,0,0,0.498
+			shear	0,0.22
+		}
+		windowDef ult_val
+		{
+			rect	249,432,( "gui::player_ultpct" * 40 ),25
+			visible	1
+			shear	0,0.22
+			backcolor	( "gui::player_ult_bright"),( "gui::player_ult_bright"),( "gui::player_ult_bright"),0.9
+		}
+		windowDef ult_text
+		{
+			rect	243,431,52,26
+			visible	1
+			forecolor	0.839,0.894,0.737,1
+			text	"gui::player_ult_text"
 			textscale	0.4
 			font	"fonts/chain"
 			shear	0,-.22

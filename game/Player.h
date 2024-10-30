@@ -287,10 +287,13 @@ public:
 	};
 
 	Legend					legend;
-
+	
 	int						tacRefreshTime;
 	int						tacDurationTime;
 	int						tacStartTime;
+
+	int						ultStartTime;
+	int						ultRefreshTime;
 
 	int						evoLevel;
 	int						evoPoints;
@@ -822,6 +825,8 @@ public:
 	void					DoPassiveAbility(void);
 	void					TacticalAbility(void);
 	void					EndTacticalAbility(void);
+
+	void					UltimateAbility(void);
 
 protected:
 	void					SetupHead( const char* modelKeyName = "", idVec3 headOffset = idVec3(0, 0, 0) );

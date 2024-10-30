@@ -624,7 +624,7 @@ void Cmd_UltAbility_f(const idCmdArgs& args) {
 		return;
 	}
 
-	//player->TacticalAbility();
+	player->UltimateAbility();
 }
 
 /*

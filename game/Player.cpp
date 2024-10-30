@@ -1164,6 +1164,7 @@ idPlayer::idPlayer() {
 	fovMult					= 1.0f;
 	tacRefreshTime			= -1;
 	tacDurationTime			= -1;
+	ultRefreshTime			= -1;
 	attackIntent			= false;
 	wasCrouching			= false;
 	isSliding				= false;
@@ -3454,6 +3455,17 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		_hud->SetStateString("player_tac_text", "Q");
 	}
 
+	if (gameLocal.time < ultRefreshTime) {
+		float refresh = (float)(ultRefreshTime - gameLocal.time) / (float)(ultRefreshTime - ultStartTime);
+		_hud->SetStateFloat("player_ultpct", 1.0f - refresh);
+		_hud->SetStateFloat("player_ult_bright", 0.25f);
+		_hud->SetStateString("player_ult_text", "");
+	}
+	else {
+		_hud->SetStateFloat("player_ultpct", 0.0f);
+		_hud->SetStateString("player_ult_text", "Z");
+	}
+
 	temp = _hud->State().GetInt("player_evo", "-1");
 	if (temp != evoPoints) {
 		_hud->HandleNamedEvent("updateEvoPoints");
@@ -4047,6 +4059,11 @@ void idPlayer::OnDamageEnemy(int damage) {
 			evoLevel++;
 		}
 
+		if (evoLevel == 0) {
+			inventory.maxarmor = 0;
+			evoPoints = 100;
+		}
+
 		if (evoLevel == 1) {
 			inventory.maxarmor = 50;
 			evoPoints = 500;
@@ -4096,7 +4113,7 @@ void idPlayer::TacticalAbility(void) {
 		duration = 5;
 		cooldown = 1;
 		speedMult = 1.4f;
-		fovMult = 1.1f;
+		fovMult = 1.05f;
 		//sprintWeaponStance = idVec3::idVec3(0.0f, -40.0f, 0.0f);
 
 		if (health <= 20) {
@@ -4124,8 +4141,27 @@ void idPlayer::EndTacticalAbility(void) {
 		fovMult = 1.0f;
 		//sprintWeaponStance = DefaultSprintStance();
 	}
+}
 
-	//tacDurationTime = -1;
+/*
+===============
+idPlayer::UltimateAbility
+===============
+*/
+void idPlayer::UltimateAbility(void) {
+	if (gameLocal.time < ultRefreshTime) {
+		return;
+	}
+
+	int cooldown = 0;
+
+	if (legend == LEGEND_OCTANE) {
+		cooldown = 10;
+		
+	}
+
+	ultStartTime = gameLocal.time;
+	ultRefreshTime = ultStartTime + (cooldown * 1000);
 }
 
 /*
