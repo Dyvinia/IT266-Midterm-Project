@@ -13,7 +13,7 @@ windowDef Desktop
 	definevec4	"ws_grey"	0.190,0.284,0.168,0.6
 	definevec4	"typecolor"	0.866,0.921,0.764,1
 	definevec4	"typecolor_strogg"	0.988,1,0.784,1
-	definevec4	"healthicon"	0.25,0.631,0.51,0.6
+	definevec4	"healthicon"	0.309,0.725,0.6,0.6
 	definevec4	"armoricon"	0.658,0.639,0.376,0.6
 	definevec4	"healthicon_mp"	0.980,0.168,0.0196,0.8
 	definevec4	"armoricon_mp"	0.968,0.752,0.0156,0.8
@@ -701,7 +701,7 @@ windowDef Desktop
 			rect	12,414,16,16
 			visible	1
 			background	"gfx/guis/hud/icons/item_health"
-			matcolor	0.25,0.631,0.51,0.6
+			matcolor	0.309,0.725,0.6,0.6
 		}
 		windowDef icon_armor
 		{
@@ -1681,7 +1681,7 @@ windowDef Desktop
 
 		windowDef pickup_backbar
 		{
-			rect	21,401,230,24
+			rect	11,361,230,24
 			visible	1
 			background	"gfx/guis/hud/pickupbar"
 			matcolor	0,0,0,0.5
@@ -1689,7 +1689,7 @@ windowDef Desktop
 		}
 		windowDef t_pickupname
 		{
-			rect	42,404,236,15
+			rect	32,364,236,15
 			visible	1
 			forecolor	0.862,0.917,0.760,1
 			text	"gui::itemtext"
@@ -1699,7 +1699,7 @@ windowDef Desktop
 		}
 		windowDef icon_pickup
 		{
-			rect	26,405,16,16
+			rect	16,365,16,16
 			visible	1
 			background	"gui::itemicon"
 			matcolor	0.666,0.674,0.435,0.8
