@@ -290,6 +290,7 @@ public:
 
 	int						tacRefreshTime;
 	int						tacDurationTime;
+	int						tacStartTime;
 
 	friend class idThread;
 

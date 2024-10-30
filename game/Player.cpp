@@ -3417,7 +3417,28 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		_hud->SetStateInt ( "player_armorDelta", temp == -1 ? 0 : (temp - inventory.armor) );
 		_hud->SetStateInt ( "player_armor", inventory.armor );
 		_hud->SetStateFloat	( "player_armorpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)inventory.armor / (float)inventory.maxarmor ) );
+		_hud->SetStateFloat	( "player_armortotalpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)inventory.maxarmor / 100.0f ) );
+		_hud->SetStateFloat("player_armorcolor_r", 1.0f);
+		_hud->SetStateFloat("player_armorcolor_g", 0.0f);
+		_hud->SetStateFloat("player_armorcolor_b", 1.0f);
 		_hud->HandleNamedEvent ( "updateArmor" );
+	}
+
+	if (gameLocal.time < tacDurationTime) {
+		float duration = (float)(tacDurationTime - gameLocal.time) / (float)(tacDurationTime - tacStartTime);
+		_hud->SetStateFloat("player_tacpct", duration);
+		_hud->SetStateFloat("player_tac_bright", 0.75f);
+		_hud->SetStateString("player_tac_text", "");
+	}
+	else if (gameLocal.time < tacRefreshTime) {
+		float refresh = (float)(tacRefreshTime - gameLocal.time) / (float)(tacRefreshTime - tacDurationTime);
+		_hud->SetStateFloat("player_tacpct", 1.0f - refresh);
+		_hud->SetStateFloat("player_tac_bright", 0.25f);
+		_hud->SetStateString("player_tac_text", "");
+	}
+	else {
+		_hud->SetStateFloat("player_tacpct", 0.0f);
+		_hud->SetStateString("player_tac_text", "Q");
 	}
 	
 	// Boss bar
@@ -4011,6 +4032,7 @@ void idPlayer::TacticalAbility(void) {
 		}
 	}
 
+	tacStartTime = gameLocal.time;
 	tacDurationTime = gameLocal.time + (duration * 1000);
 	tacRefreshTime = tacDurationTime + (cooldown * 1000);
 }
@@ -4027,7 +4049,7 @@ void idPlayer::EndTacticalAbility(void) {
 		//sprintWeaponStance = DefaultSprintStance();
 	}
 
-	tacDurationTime = -1;
+	//tacDurationTime = -1;
 }
 
 /*
