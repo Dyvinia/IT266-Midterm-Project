@@ -4047,7 +4047,7 @@ void idPlayer::StopFiring( void ) {
 
 /*
 ===============
-idPlayer::StopFiring
+idPlayer::OnDamageEnemy
 ===============
 */
 void idPlayer::OnDamageEnemy(int damage) {
