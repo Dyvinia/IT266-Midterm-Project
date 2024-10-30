@@ -739,6 +739,19 @@ windowDef Desktop
 			font	"fonts/marine"
 			shear	0,-.22
 			notime	1
+
+			onInit {
+				namedEvent "updateEvoPoints";
+			}
+
+			onNamedEvent updateEvoPoints {
+				resettime "evo_value_text" "0";
+			}
+
+			onTime 0 {
+				transition "textscale" "0.4" "0.32" "250" ;
+			}
+
 		}
 		windowDef evo_text
 		{

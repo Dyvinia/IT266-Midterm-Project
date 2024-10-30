@@ -3434,21 +3434,6 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		_hud->SetStateInt ( "player_armor", inventory.armor );
 		_hud->SetStateFloat	( "player_armorpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)inventory.armor / 100.0f) );
 		_hud->SetStateFloat	( "player_armortotalpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)inventory.maxarmor / 100.0f ) );
-		if (evoLevel == 1) {
-			_hud->SetStateFloat("player_armorcolor_r", 156 / 255.f);
-			_hud->SetStateFloat("player_armorcolor_g", 172 / 255.f);
-			_hud->SetStateFloat("player_armorcolor_b", 173 / 255.f);
-		}
-		if (evoLevel == 2) {
-			_hud->SetStateFloat("player_armorcolor_r", 98 / 255.f);
-			_hud->SetStateFloat("player_armorcolor_g", 200 / 255.f);
-			_hud->SetStateFloat("player_armorcolor_b", 255 / 255.f);
-		}
-		if (evoLevel == 3) {
-			_hud->SetStateFloat("player_armorcolor_r", 200 / 255.f);
-			_hud->SetStateFloat("player_armorcolor_g", 77 / 255.f);
-			_hud->SetStateFloat("player_armorcolor_b", 255 / 255.f);
-		}
 		_hud->HandleNamedEvent ( "updateArmor" );
 	}
 
@@ -3469,14 +3454,36 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		_hud->SetStateString("player_tac_text", "Q");
 	}
 
-	if (evoLevel < 3) {
-		_hud->SetStateString("player_evo_label", "EVO Required:");
-		_hud->SetStateInt("player_evo", evoPoints);
+	temp = _hud->State().GetInt("player_evo", "-1");
+	if (temp != evoPoints) {
+		_hud->HandleNamedEvent("updateEvoPoints");
+
+		if (evoLevel == 1) {
+			_hud->SetStateFloat("player_armorcolor_r", 156 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_g", 172 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_b", 173 / 255.f);
+		}
+		if (evoLevel == 2) {
+			_hud->SetStateFloat("player_armorcolor_r", 98 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_g", 200 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_b", 255 / 255.f);
+		}
+		if (evoLevel == 3) {
+			_hud->SetStateFloat("player_armorcolor_r", 200 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_g", 77 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_b", 255 / 255.f);
+		}
+
+		if (evoLevel < 3) {
+			_hud->SetStateString("player_evo_label", "EVO Required:");
+			_hud->SetStateInt("player_evo", evoPoints);
+		}
+		else {
+			_hud->SetStateString("player_evo_label", "Max Level");
+			_hud->SetStateString("player_evo", "");
+		}
 	}
-	else {
-		_hud->SetStateString("player_evo_label", "Max Level");
-		_hud->SetStateString("player_evo", "");
-	}
+	
 	
 	// Boss bar
 	if ( _hud->State().GetInt ( "boss_health", "-1" ) != (bossEnemy ? bossEnemy->health : -1) ) {
