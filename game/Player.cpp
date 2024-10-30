@@ -1170,6 +1170,7 @@ idPlayer::idPlayer() {
 	isSliding				= false;
 	isSprinting				= false;
 	sprintFrac				= 0.0f;
+	crouchFrac				= 0.0f;
 	sprintWeaponStance		= DefaultSprintStance();
 	bobfracsin				= 0.0f;
 	bobCycle				= 0;
@@ -1535,6 +1536,7 @@ void idPlayer::Init( void ) {
 	lastDmgTime				= 0;
 	isSprinting				= false;
 	sprintFrac				= 0.0f;
+	crouchFrac				= 0.0f;
 	bobCycle				= 0;
 	bobFrac					= 0.0f;
 	landChange				= 0;
@@ -4162,10 +4164,12 @@ void idPlayer::UltimateAbility(void) {
 	}
 
 	int cooldown = 0;
-
+	
 	if (legend == LEGEND_OCTANE) {
-		cooldown = 10;
-		
+		cooldown = 5;
+		idVec3 vel = physicsObj.GetLinearVelocity();
+		vel.z = 250.0f;
+		physicsObj.SetLinearVelocity(vel * 3.0f);
 	}
 
 	ultStartTime = gameLocal.time;
@@ -9310,7 +9314,7 @@ void idPlayer::Move( void ) {
 
 	if (physicsObj.IsWalking() && pfl.crouch && !wasCrouching) {
 		idVec3 vel = physicsObj.GetLinearVelocity();
-		if (speed > 200.0f) {
+		if (speed > 220.0f) {
 			vel.z = abs(vel.z) * -0.75f; // sliding shouldnt give a boost upwards
 			float slideSpeedMult = 2.5f * speed / 200.0f; // the faster you move while going into the slide, the faster the slide is
 			slideSpeedMult /= speedMult; // prevent slide from going overboard from speed mult
@@ -9601,6 +9605,17 @@ void idPlayer::Think( void ) {
 	else {
 		if (sprintFrac > 0.0f) {
 			sprintFrac -= 0.125f;
+		}
+	}
+	
+	if (IsCrouching()) {
+		if (crouchFrac < 1.0f) {
+			crouchFrac += 0.1f;
+		}
+	}
+	else {
+		if (crouchFrac > 0.0f) {
+			crouchFrac -= 0.075f;
 		}
 	}
 
@@ -10963,6 +10978,13 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 		angles.yaw += sprintWeaponStance.x * sprintFrac;
 		angles.pitch += sprintWeaponStance.y * sprintFrac;
 		angles.roll += sprintWeaponStance.z * sprintFrac;
+	}
+
+	idVec3 crouchWeaponStance = idVec3::idVec3(-4.0f, 0.0f, -15.0f);
+	if (crouchFrac > 0.0f) {
+		angles.yaw += crouchWeaponStance.x * crouchFrac;
+		angles.pitch += crouchWeaponStance.y * crouchFrac;
+		angles.roll += crouchWeaponStance.z * crouchFrac;
 	}
 	
 	angles += weapon->GetViewModelAngles();

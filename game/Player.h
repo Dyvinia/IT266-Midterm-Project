@@ -851,6 +851,7 @@ private:
 	bool					isSliding;
 	bool					isSprinting;
 	float					sprintFrac;
+	float					crouchFrac;
 	float					bobfracsin;
 	int						bobCycle;			// for view bobbing and footstep generation
 	float					xyspeed;
