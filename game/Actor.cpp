@@ -2487,6 +2487,9 @@ void idActor::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 	if ( damage > 0 ) {
 		int oldHealth = health;
 		AdjustHealthByDamage ( damage );
+		if (inflictor && inflictor->IsType(idPlayer::GetClassType())) {
+			static_cast<idPlayer*>(inflictor)->OnDamageEnemy(damage);
+		}
 		if ( health <= 0 ) {
 
 			//allow for quick burning

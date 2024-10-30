@@ -337,8 +337,8 @@ void idInventory::RestoreInventory( idPlayer *owner, const idDict &dict ) {
 
 	// health/armor
 	maxHealth		= dict.GetInt( "maxhealth", "100" );
-	armor			= dict.GetInt( "armor", "50" );
-	maxarmor		= dict.GetInt( "maxarmor", "100" );
+	//armor			= dict.GetInt( "armor", "50" );
+	//maxarmor		= dict.GetInt( "maxarmor", "100" );
 
 	// ammo
 	for( i = 0; i < MAX_AMMOTYPES; i++ ) {
@@ -1151,6 +1151,12 @@ idPlayer::idPlayer() {
 	hipJoint				= INVALID_JOINT;
 	chestJoint				= INVALID_JOINT;
  	headJoint				= INVALID_JOINT;
+
+	evoLevel				= 0;
+	evoPoints				= 100;
+
+	inventory.armor			= 0;
+	inventory.maxarmor		= 0;
 
 	bobFoot					= 0;
 	bobFrac					= 0.0f;
@@ -2101,6 +2107,11 @@ void idPlayer::Save( idSaveGame *savefile ) const {
 
 	playerView.Save( savefile );
 
+	savefile->WriteInt(evoPoints);
+	savefile->WriteInt(evoLevel);
+	savefile->WriteInt(inventory.armor);
+	savefile->WriteInt(inventory.maxarmor);
+
 	savefile->WriteBool( noclip );
 	savefile->WriteBool( godmode );
 	savefile->WriteInt ( godmodeDamage );	
@@ -2363,7 +2374,12 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 
 	playerView.Restore( savefile );
 
-	savefile->ReadBool( noclip );
+	savefile->ReadInt( evoPoints );
+	savefile->ReadInt( evoLevel );
+	savefile->ReadInt( inventory.armor );
+	savefile->ReadInt(inventory.maxarmor);
+
+	savefile->ReadBool(noclip);
 	savefile->ReadBool( godmode );
 	savefile->ReadInt ( godmodeDamage );	
 	savefile->ReadBool( undying );
@@ -3416,11 +3432,23 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	if ( temp != inventory.armor ) {
 		_hud->SetStateInt ( "player_armorDelta", temp == -1 ? 0 : (temp - inventory.armor) );
 		_hud->SetStateInt ( "player_armor", inventory.armor );
-		_hud->SetStateFloat	( "player_armorpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)inventory.armor / (float)inventory.maxarmor ) );
+		_hud->SetStateFloat	( "player_armorpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)inventory.armor / 100.0f) );
 		_hud->SetStateFloat	( "player_armortotalpct", idMath::ClampFloat ( 0.0f, 1.0f, (float)inventory.maxarmor / 100.0f ) );
-		_hud->SetStateFloat("player_armorcolor_r", 1.0f);
-		_hud->SetStateFloat("player_armorcolor_g", 0.0f);
-		_hud->SetStateFloat("player_armorcolor_b", 1.0f);
+		if (evoLevel == 1) {
+			_hud->SetStateFloat("player_armorcolor_r", 156 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_g", 172 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_b", 173 / 255.f);
+		}
+		if (evoLevel == 2) {
+			_hud->SetStateFloat("player_armorcolor_r", 98 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_g", 200 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_b", 255 / 255.f);
+		}
+		if (evoLevel == 3) {
+			_hud->SetStateFloat("player_armorcolor_r", 200 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_g", 77 / 255.f);
+			_hud->SetStateFloat("player_armorcolor_b", 255 / 255.f);
+		}
 		_hud->HandleNamedEvent ( "updateArmor" );
 	}
 
@@ -3439,6 +3467,15 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	else {
 		_hud->SetStateFloat("player_tacpct", 0.0f);
 		_hud->SetStateString("player_tac_text", "Q");
+	}
+
+	if (evoLevel < 3) {
+		_hud->SetStateString("player_evo_label", "EVO Required:");
+		_hud->SetStateInt("player_evo", evoPoints);
+	}
+	else {
+		_hud->SetStateString("player_evo_label", "Max Level");
+		_hud->SetStateString("player_evo", "");
 	}
 	
 	// Boss bar
@@ -3991,13 +4028,44 @@ void idPlayer::StopFiring( void ) {
 
 /*
 ===============
+idPlayer::StopFiring
+===============
+*/
+void idPlayer::OnDamageEnemy(int damage) {
+	evoPoints -= damage;
+
+	if (evoPoints < 0) {
+		evoPoints = 0;
+		if (evoLevel < 3) {
+			evoLevel++;
+		}
+
+		if (evoLevel == 1) {
+			inventory.maxarmor = 50;
+			evoPoints = 500;
+		}
+
+		if (evoLevel == 2) {
+			inventory.maxarmor = 75;
+			evoPoints = 1000;
+		}
+
+		if (evoLevel == 3) {
+			inventory.maxarmor = 100;
+			evoPoints = 1000;
+		}
+	}
+}
+
+/*
+===============
 idPlayer::DoPassiveAbility
 ===============
 */
 void idPlayer::DoPassiveAbility(void) {
 	if (legend == LEGEND_OCTANE) {
 		if (gameLocal.time % 1000 == 0) {
-			if (health <= inventory.maxHealth) {
+			if (health < inventory.maxHealth) {
 				health += 1;
 			}
 		}
@@ -4030,6 +4098,7 @@ void idPlayer::TacticalAbility(void) {
 		else {
 			health -= 20;
 		}
+		StartSound("snd_pain_large", SND_CHANNEL_VOICE, 0, false, NULL);
 	}
 
 	tacStartTime = gameLocal.time;
@@ -4808,7 +4877,7 @@ bool idPlayer::GivePowerUp( int powerup, int time, bool team ) {
 		case POWERUP_GUARD: {
 			nextHealthPulse = gameLocal.time + HEALTH_PULSE;
 			inventory.maxHealth = 200;
-			inventory.maxarmor = 200;
+			//inventory.maxarmor = 200;
 
 			break;
 		}
@@ -9192,8 +9261,9 @@ void idPlayer::Move( void ) {
 		idVec3 vel = physicsObj.GetLinearVelocity();
 		if (speed > 200.0f) {
 			vel.z = abs(vel.z) * -0.75f; // sliding shouldnt give a boost upwards
-			float speedMult = 2.5f * speed / 200.0f; // the faster you move while going into the slide, the faster the slide is
-			physicsObj.SetLinearVelocity(vel * speedMult);
+			float slideSpeedMult = 2.5f * speed / 200.0f; // the faster you move while going into the slide, the faster the slide is
+			slideSpeedMult /= speedMult; // prevent slide from going overboard from speed mult
+			physicsObj.SetLinearVelocity(vel * slideSpeedMult);
 			isSliding = true;
 		}
 	}
@@ -9458,6 +9528,12 @@ void idPlayer::Think( void ) {
 	}
 
 	DoPassiveAbility();
+
+	if (gameLocal.time % 100 == 0 && health >= inventory.maxHealth) {
+		if (inventory.armor < inventory.maxarmor) {
+			inventory.armor += 1;
+		}
+	}
 
 	if (gameLocal.time > tacDurationTime) {
 		EndTacticalAbility();
@@ -10146,6 +10222,18 @@ void idPlayer::CalcDamagePoints( idEntity *inflictor, idEntity *attacker, const 
 	damageDef->GetInt( "damage", "20", damage );
 	damage = GetDamageForLocation( damage, location );
 
+	armorSave = damage;
+	if (armorSave > inventory.armor) {
+		damage = armorSave - inventory.armor;
+		armorSave = inventory.armor;
+	}
+	else {
+		damage = 0;
+	}
+	*health = damage;
+	*armor = armorSave;
+	return;
+
 	// optional different damage in team games
 	if( gameLocal.isMultiplayer && gameLocal.IsTeamGame() && damageDef->GetInt( "damage_team" ) ) {
 		damage = damageDef->GetInt( "damage_team" );
@@ -10485,7 +10573,11 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 				lastDmgTime = gameLocal.time;
 			}
 		}
-	} else {
+	} 
+	else if (armorSave > 0) {
+		pfl.pain = Pain(inflictor, attacker, damage, dir, location);
+	}
+	else {
  		// don't accumulate impulses
 		if ( af.IsLoaded() ) {
 			// clear impacts
@@ -12528,7 +12620,10 @@ void idPlayer::WriteToSnapshot( idBitMsgDelta &msg ) const {
 	msg.WriteDeltaFloat( 0.0f, deltaViewAngles[1] );
 	msg.WriteDeltaFloat( 0.0f, deltaViewAngles[2] );
 	msg.WriteShort( health );
+	msg.WriteShort( evoPoints );
+	msg.WriteShort( evoLevel );
 	msg.WriteByte( inventory.armor );
+	msg.WriteByte( inventory.maxarmor );
  	msg.WriteBits( lastDamageDef, gameLocal.entityDefBits );
 	msg.WriteDir( lastDamageDir, 9 );
 	msg.WriteShort( lastDamageLocation );
@@ -12586,7 +12681,10 @@ void idPlayer::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	deltaViewAngles[1] = msg.ReadDeltaFloat( 0.0f );
 	deltaViewAngles[2] = msg.ReadDeltaFloat( 0.0f );
 	health = msg.ReadShort();
+	evoPoints = msg.ReadShort();
+	evoLevel = msg.ReadShort();
 	inventory.armor = msg.ReadByte();
+	inventory.maxarmor = msg.ReadByte();
  	lastDamageDef = msg.ReadBits( gameLocal.entityDefBits );
 	lastDamageDir = msg.ReadDir( 9 );
 	lastDamageLocation = msg.ReadShort();

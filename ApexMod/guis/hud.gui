@@ -704,7 +704,7 @@ windowDef Desktop
 		}
 		windowDef tac_backbar
 		{
-			rect	200,420,50,50
+			rect	190,420,50,50
 			visible	1
 			background	"gfx/guis/hud/backbar"
 			matcolor	0,0,0,0.5
@@ -712,14 +712,14 @@ windowDef Desktop
 		}
 		windowDef tac_val
 		{
-			rect	205,432,( "gui::player_tacpct" * 40 ),25
+			rect	195,432,( "gui::player_tacpct" * 40 ),25
 			visible	1
 			shear	0,0.22
 			backcolor	( "gui::player_tac_bright"),( "gui::player_tac_bright"),( "gui::player_tac_bright"),0.9
 		}
 		windowDef tac_text
 		{
-			rect	199,431,52,26
+			rect	189,431,52,26
 			visible	1
 			forecolor	0.839,0.894,0.737,1
 			text	"gui::player_tac_text"
@@ -728,6 +728,28 @@ windowDef Desktop
 			shear	0,-.22
 			textalign	1
 			notime	1
+		}
+		windowDef evo_value_text
+		{
+			rect	142,390,50,26
+			visible	1
+			forecolor	0.823,0.878,0.721,1
+			text	"gui::player_evo"
+			textscale	0.32
+			font	"fonts/marine"
+			shear	0,-.22
+			notime	1
+		}
+		windowDef evo_text
+		{
+			rect	6,390,152,26
+			visible	1
+			forecolor	0.8,0.847,0.690,1
+			text	"gui::player_evo_label"
+			textscale	0.32
+			shear	0,-.22
+			notime	1
+			font	"fonts/marine"
 		}
 	}
 	windowDef p_ammo_mp

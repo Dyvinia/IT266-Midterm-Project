@@ -292,6 +292,9 @@ public:
 	int						tacDurationTime;
 	int						tacStartTime;
 
+	int						evoLevel;
+	int						evoPoints;
+
 	friend class idThread;
 
 	usercmd_t				usercmd;
@@ -447,6 +450,8 @@ public:
 
 							idPlayer();
 	virtual					~idPlayer();
+
+	void					OnDamageEnemy( int );
 
 	void					Spawn( void );
 	void					Think( void );
