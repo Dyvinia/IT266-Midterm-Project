@@ -13,7 +13,7 @@ windowDef Desktop
 	definevec4	"ws_grey"	0.190,0.284,0.168,0.6
 	definevec4	"typecolor"	0.866,0.921,0.764,1
 	definevec4	"typecolor_strogg"	0.988,1,0.784,1
-	definevec4	"healthicon"	0.658,0.639,0.376,0.6
+	definevec4	"healthicon"	0.25,0.631,0.51,0.6
 	definevec4	"armoricon"	0.658,0.639,0.376,0.6
 	definevec4	"healthicon_mp"	0.980,0.168,0.0196,0.8
 	definevec4	"armoricon_mp"	0.968,0.752,0.0156,0.8
@@ -171,6 +171,7 @@ windowDef Desktop
 		{
 			resettime "armor_amount" "0" ;
 		}
+		resettime "icon_armor" "0" ;
 	}
 
 	onNamedEvent weaponChange {
@@ -700,7 +701,19 @@ windowDef Desktop
 			rect	12,414,16,16
 			visible	1
 			background	"gfx/guis/hud/icons/item_health"
-			matcolor	0.658,0.639,0.376,0.6
+			matcolor	0.25,0.631,0.51,0.6
+		}
+		windowDef icon_armor
+		{
+			rect	30,414,16,16
+			visible	1
+			background	"gfx/guis/hud/icons/item_armor"
+			matcolor	( "gui::player_armorcolor_r"),( "gui::player_armorcolor_g"),( "gui::player_armorcolor_b"),0.6
+
+			onTime 0 {
+				transition "icon_armor::matcolor" "$desktop::white" "$icon_armorvest_mp::matcolor" "250" ;
+			}
+
 		}
 		windowDef tac_backbar
 		{
@@ -1005,7 +1018,7 @@ windowDef Desktop
 			rect	424,458,16,16
 			visible	1
 			background	"gfx/guis/hud/icons/item_armor"
-			matcolor	0.980,0.168,0.0196,0.8
+			matcolor	( "gui::player_armorcolor_r"),( "gui::player_armorcolor_g"),( "gui::player_armorcolor_b"),0.6
 		}
 	}
 	windowDef p_weapswitch

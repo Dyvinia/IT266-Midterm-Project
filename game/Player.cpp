@@ -3494,6 +3494,14 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 			_hud->SetStateString("player_evo_label", "Max Level");
 			_hud->SetStateString("player_evo", "");
 		}
+
+		temp = _hud->State().GetInt("player_evo_level", "-1");
+		if (temp != evoLevel) {
+			_hud->SetStateInt("player_evo_level", evoLevel);
+			_hud->SetStateFloat("player_armorpct", idMath::ClampFloat(0.0f, 1.0f, (float)inventory.armor / 100.0f));
+			_hud->SetStateFloat("player_armortotalpct", idMath::ClampFloat(0.0f, 1.0f, (float)inventory.maxarmor / 100.0f));
+			_hud->HandleNamedEvent("updateArmor");
+		}
 	}
 	
 	
