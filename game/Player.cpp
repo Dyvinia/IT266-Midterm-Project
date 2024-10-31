@@ -1167,9 +1167,11 @@ idPlayer::idPlayer() {
 	tacRefreshTime			= -1;
 	tacDurationTime			= -1;
 	ultRefreshTime			= -1;
+	ultDurationTime			= -1;
 	flightFuel				= 600;
 	maxFlightFuel			= 600;
 	currentDamageNumber		= 0;
+	nextHealTime			= 0;
 	attacking				= false;
 	wasCrouching			= false;
 	isSliding				= false;
@@ -3497,8 +3499,14 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		_hud->SetStateString("player_tac_text", "Q");
 	}
 
-	if (gameLocal.time < ultRefreshTime) {
-		float refresh = (float)(ultRefreshTime - gameLocal.time) / (float)(ultRefreshTime - ultStartTime);
+	if (gameLocal.time < ultDurationTime) {
+		float duration = (float)(ultDurationTime - gameLocal.time) / (float)(ultDurationTime - ultStartTime);
+		_hud->SetStateFloat("player_ultpct", duration);
+		_hud->SetStateFloat("player_ult_bright", 0.75f);
+		_hud->SetStateString("player_ult_text", "");
+	}
+	else if (gameLocal.time < ultRefreshTime) {
+		float refresh = (float)(ultRefreshTime - gameLocal.time) / (float)(ultRefreshTime - ultDurationTime);
 		_hud->SetStateFloat("player_ultpct", 1.0f - refresh);
 		_hud->SetStateFloat("player_ult_bright", 0.25f);
 		_hud->SetStateString("player_ult_text", "");
@@ -4165,10 +4173,11 @@ idPlayer::DoPassiveAbility
 */
 void idPlayer::DoPassiveAbility(void) {
 	if (legend == LEGEND_OCTANE) {
-		if (gameLocal.time % 1000 == 0) {
+		if (gameLocal.time >= nextHealTime) {
 			if (health < inventory.maxHealth) {
 				health += 1;
 			}
+			nextHealTime = gameLocal.time + 1000;
 		}
 	}
 	if (legend == LEGEND_VALKYRIE) {
@@ -4237,7 +4246,7 @@ void idPlayer::TacticalAbility(void) {
 	}
 	if (legend == LEGEND_VALKYRIE) {
 		duration = 1;
-		cooldown = 10;
+		cooldown = 12;
 	}
 
 	nextRocketTime = gameLocal.time;
@@ -4300,9 +4309,11 @@ void idPlayer::UltimateAbility(void) {
 		return;
 	}
 
-	int cooldown = 0;
+	float duration = 0;
+	float cooldown = 0;
 	
 	if (legend == LEGEND_OCTANE) {
+		duration = 0.1;
 		cooldown = 5;
 		idVec3 vel = physicsObj.GetLinearVelocity();
 		vel.z = 250.0f;
@@ -4311,7 +4322,8 @@ void idPlayer::UltimateAbility(void) {
 	}
 
 	ultStartTime = gameLocal.time;
-	ultRefreshTime = ultStartTime + (cooldown * 1000);
+	ultDurationTime = gameLocal.time + (int)(duration * 1000);
+	ultRefreshTime = ultDurationTime + (int)(cooldown * 1000);
 }
 
 /*

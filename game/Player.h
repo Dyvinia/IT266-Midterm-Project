@@ -294,6 +294,7 @@ public:
 	bool					tacActive;
 
 	int						ultStartTime;
+	int						ultDurationTime;
 	int						ultRefreshTime;
 
 	int						evoLevel;
@@ -301,6 +302,8 @@ public:
 
 	int						currentDamageNumber;
 	int						lastDamageNumberUpdate;
+
+	int						nextHealTime;
 
 	int						nextRocketTime;
 

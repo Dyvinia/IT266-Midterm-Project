@@ -2487,11 +2487,31 @@ void idActor::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 	if ( damage > 0 ) {
 		int oldHealth = health;
 		AdjustHealthByDamage ( damage );
-		if (health > 0 && inflictor && inflictor->IsType(idPlayer::GetClassType())) {
-			static_cast<idPlayer*>(inflictor)->OnDamageEnemy(damage);
+		if (inflictor && inflictor->IsType(idPlayer::GetClassType())) {
+			int damaged = 0;
+			if (health > 0) {
+				damaged = damage;
+			}
+			else {
+				damaged = damage + health;
+				if (damaged < 0) {
+					damaged = 0;
+				}
+			}
+			static_cast<idPlayer*>(inflictor)->OnDamageEnemy(damaged);
 		}
-		else if (health > 0 && attacker && attacker->IsType(idPlayer::GetClassType())) {
-			static_cast<idPlayer*>(attacker)->OnDamageEnemy(damage);
+		else if (attacker && attacker->IsType(idPlayer::GetClassType())) {
+			int damaged = 0;
+			if (health > 0) {
+				damaged = damage;
+			}
+			else {
+				damaged = damage + health;
+				if (damaged < 0) {
+					damaged = 0;
+				}
+			}
+			static_cast<idPlayer*>(attacker)->OnDamageEnemy(damaged);
 		}
 		if ( health <= 0 ) {
 
