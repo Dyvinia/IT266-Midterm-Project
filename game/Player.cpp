@@ -4160,9 +4160,9 @@ void idPlayer::DoPassiveAbility(void) {
 		if (usercmd.upmove >= 1.0f && !pfl.jump) {
 			idVec3 vel = physicsObj.GetLinearVelocity();
 			if (((vel.z <= 0.0f && flightTime == 0) || flightTime > 0) && flightFuel > 0) {
-				vel.z = ((float)flightTime)/2.0f + 50.0f;
-				if (vel.z > 100.0f) {
-					vel.z = 100.0f;
+				vel.z = ((float)flightTime)/1.5f + 75.0f;
+				if (vel.z > 150.0f) {
+					vel.z = 150.0f;
 				}
 				physicsObj.SetLinearVelocity(vel * 0.975f);
 				if (flightTime == 0) {
@@ -4213,10 +4213,42 @@ void idPlayer::TacticalAbility(void) {
 		}
 		tacActive = true;
 	}
+	if (legend == LEGEND_VALKYRIE) {
+		duration = 1;
+		cooldown = 10;
+	}
 
+	nextRocketTime = gameLocal.time;
 	tacStartTime = gameLocal.time;
 	tacDurationTime = gameLocal.time + (duration * 1000);
 	tacRefreshTime = tacDurationTime + (cooldown * 1000);
+}
+
+/*
+===============
+idPlayer::DoTacticalAbility
+===============
+*/
+void idPlayer::DoTacticalAbility(void) {
+	if (legend == LEGEND_VALKYRIE) {
+		int roundedTime = (((gameLocal.time - tacStartTime)/10)*10);
+		if (gameLocal.time < tacDurationTime && gameLocal.time >= nextRocketTime) {
+			float ang = idMath::Sin(0.15f * gameLocal.random.RandomFloat());
+			float spin = (float)DEG2RAD(360.0f) * gameLocal.random.RandomFloat();
+			idVec3 dir = firstPersonViewAxis[0] + firstPersonViewAxis[2] * (ang * idMath::Sin(spin)) - firstPersonViewAxis[1] * (ang * idMath::Cos(spin));
+			dir.Normalize();
+			idDict	args;
+			idEntity* ent;
+			args.Set("classname", "projectile_rocket_valk");
+			args.SetInt("instance", GetInstance());
+			gameLocal.SpawnEntityDef(args, &ent, false);
+			idProjectile* proj = static_cast<idProjectile*>(ent);
+
+			proj->Create(this, firstPersonViewOrigin, dir, this);
+			proj->Launch(firstPersonViewOrigin + (idVec3::idVec3(0.5, 10, 8) * firstPersonViewAxis), dir, idVec3::idVec3(0, 0, 0));
+			nextRocketTime = gameLocal.time + 125;
+		}
+	}
 }
 
 /*
@@ -9682,6 +9714,7 @@ void idPlayer::Think( void ) {
 	}
 
 	DoPassiveAbility();
+	DoTacticalAbility();
 
 	if (gameLocal.time % 100 == 0 && health >= inventory.maxHealth) {
 		if (inventory.armor < inventory.maxarmor) {

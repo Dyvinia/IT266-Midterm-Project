@@ -299,6 +299,8 @@ public:
 	int						evoLevel;
 	int						evoPoints;
 
+	int						nextRocketTime;
+
 	friend class idThread;
 
 	usercmd_t				usercmd;
@@ -834,6 +836,7 @@ public:
 
 	void					DoPassiveAbility(void);
 	void					TacticalAbility(void);
+	void					DoTacticalAbility(void);
 	void					EndTacticalAbility(void);
 
 	void					UltimateAbility(void);
