@@ -304,6 +304,7 @@ public:
 	int						lastDamageNumberUpdate;
 
 	int						nextHealTime;
+	int						nextShieldTime;
 
 	int						nextRocketTime;
 	int						rocketsFired;

@@ -1172,6 +1172,7 @@ idPlayer::idPlayer() {
 	maxFlightFuel			= 600;
 	currentDamageNumber		= 0;
 	nextHealTime			= 0;
+	nextShieldTime			= 0;
 	attacking				= false;
 	wasCrouching			= false;
 	isSliding				= false;
@@ -4183,6 +4184,14 @@ void idPlayer::DoPassiveAbility(void) {
 			nextHealTime = gameLocal.time + 1000;
 		}
 	}
+	if (legend == LEGEND_REVENANT) {
+		if (gameLocal.time < ultDurationTime && gameLocal.time >= nextHealTime) {
+			if (health < inventory.maxHealth) {
+				health += 1;
+			}
+			nextHealTime = gameLocal.time + 250;
+		}
+	}
 	if (legend == LEGEND_VALKYRIE) {
 		if (physicsObj.IsWalking()) {
 			flightTime = 0;
@@ -4368,9 +4377,18 @@ void idPlayer::UltimateAbility(void) {
 		physicsObj.SetLinearVelocity(vel * 3.0f);
 		hasDoubleJump = true;
 	}
-	if (legend == LEGEND_VALKYRIE) {
+	if (legend == LEGEND_REVENANT) {
 		duration = 10;
 		cooldown = 30;
+		StartSound("snd_pain_large", SND_CHANNEL_VOICE, 0, false, NULL);
+		StartSound("snd_powerup_regen", SND_CHANNEL_POWERUP, 0, false, NULL);
+		if (hud) {
+			hud->HandleNamedEvent("updateOverlay");
+		}
+	}
+	if (legend == LEGEND_VALKYRIE) {
+		duration = 10;
+		cooldown = 20;
 		nextRocketTime = gameLocal.time;
 	}
 
@@ -9807,9 +9825,18 @@ void idPlayer::Think( void ) {
 	DoPassiveAbility();
 	DoTacticalAbility();
 
-	if (gameLocal.time % 100 == 0 && health >= inventory.maxHealth) {
-		if (inventory.armor < inventory.maxarmor) {
-			inventory.armor += 1;
+	if (gameLocal.time >= nextShieldTime) {
+		if (legend == LEGEND_REVENANT && gameLocal.time < ultDurationTime) {
+			if (inventory.armor < inventory.maxarmor) {
+				inventory.armor += 1;
+			}
+			nextShieldTime = gameLocal.time + 125;
+		}
+		else if (health >= inventory.maxHealth) {
+			if (inventory.armor < inventory.maxarmor) {
+				inventory.armor += 1;
+			}
+			nextShieldTime = gameLocal.time + 500;
 		}
 	}
 
