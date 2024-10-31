@@ -1173,6 +1173,7 @@ idPlayer::idPlayer() {
 	wasCrouching			= false;
 	isSliding				= false;
 	isSprinting				= false;
+	tacActive				= false;
 	sprintFrac				= 0.0f;
 	crouchFrac				= 0.0f;
 	sprintWeaponStance		= DefaultSprintStance();
@@ -1539,6 +1540,7 @@ void idPlayer::Init( void ) {
 
 	lastDmgTime				= 0;
 	isSprinting				= false;
+	tacActive				= false;
 	sprintFrac				= 0.0f;
 	crouchFrac				= 0.0f;
 	bobCycle				= 0;
@@ -4173,9 +4175,11 @@ void idPlayer::TacticalAbility(void) {
 			health -= 20;
 		}
 		StartSound("snd_pain_large", SND_CHANNEL_VOICE, 0, false, NULL);
+		StartSound("snd_powerup_regen", SND_CHANNEL_POWERUP, 0, false, NULL);
 		if (hud) {
 			hud->HandleNamedEvent("updateOverlay");
 		}
+		tacActive = true;
 	}
 
 	tacStartTime = gameLocal.time;
@@ -4192,6 +4196,8 @@ void idPlayer::EndTacticalAbility(void) {
 	if (legend == LEGEND_OCTANE) {
 		speedMult = 1.0f;
 		fovMult = 1.0f;
+		StartSound("snd_powerup_wearoff", SND_CHANNEL_POWERUP, 0, false, NULL);
+		tacActive = false;
 		//sprintWeaponStance = DefaultSprintStance();
 	}
 }
@@ -9651,7 +9657,7 @@ void idPlayer::Think( void ) {
 		}
 	}
 
-	if (gameLocal.time > tacDurationTime) {
+	if (gameLocal.time > tacDurationTime && tacActive) {
 		EndTacticalAbility();
 	}
 	

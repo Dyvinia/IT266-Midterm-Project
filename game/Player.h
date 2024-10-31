@@ -291,6 +291,7 @@ public:
 	int						tacRefreshTime;
 	int						tacDurationTime;
 	int						tacStartTime;
+	bool					tacActive;
 
 	int						ultStartTime;
 	int						ultRefreshTime;
