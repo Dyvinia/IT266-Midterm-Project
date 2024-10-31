@@ -638,6 +638,28 @@ void Cmd_EvoUp_f(const idCmdArgs& args) {
 	player->EvoUp();
 }
 
+void Cmd_Octane_f(const idCmdArgs& args) {
+	idPlayer* player;
+
+	player = gameLocal.GetLocalPlayer();
+	if (!player) {
+		return;
+	}
+
+	player->UpdateLegend(idPlayer::Legend::LEGEND_OCTANE);
+}
+
+void Cmd_Valk_f(const idCmdArgs& args) {
+	idPlayer* player;
+
+	player = gameLocal.GetLocalPlayer();
+	if (!player) {
+		return;
+	}
+
+	player->UpdateLegend(idPlayer::Legend::LEGEND_VALKYRIE);
+}
+
 /*
 ==================
 Cmd_Undying_f
@@ -3086,6 +3108,10 @@ void idGameLocal::InitConsoleCommands( void ) {
 //	cmdSystem->AddCommand( "writeGameState",		WriteGameState_f,			CMD_FL_GAME,				"write game state" );
 //	cmdSystem->AddCommand( "testSaveGame",			TestSaveGame_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"test a save game for a level" );
 // RAVEN END
+	cmdSystem->AddCommand( "octane",				Cmd_Octane_f,				CMD_FL_GAME,				"changes legend to octane");
+	cmdSystem->AddCommand( "valk",					Cmd_Valk_f,					CMD_FL_GAME,				"changes legend to valkyrie");
+	cmdSystem->AddCommand( "valkyrie",				Cmd_Valk_f,					CMD_FL_GAME,				"changes legend to valkyrie");
+
 	cmdSystem->AddCommand( "evoup",					Cmd_EvoUp_f,				CMD_FL_GAME,				"level up evo");
 	cmdSystem->AddCommand( "tactical",				Cmd_TacAbility_f,			CMD_FL_GAME,				"tactical ability" );
 	cmdSystem->AddCommand( "ultimate",				Cmd_UltAbility_f,			CMD_FL_GAME,				"tactical ability" );

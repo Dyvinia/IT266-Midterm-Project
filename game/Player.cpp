@@ -1167,7 +1167,9 @@ idPlayer::idPlayer() {
 	tacRefreshTime			= -1;
 	tacDurationTime			= -1;
 	ultRefreshTime			= -1;
-	attacking			= false;
+	flightFuel				= 1000;
+	maxFlightFuel			= 1000;
+	attacking				= false;
 	wasCrouching			= false;
 	isSliding				= false;
 	isSprinting				= false;
@@ -4060,6 +4062,10 @@ void idPlayer::StopFiring( void ) {
 	}
 }
 
+void idPlayer::UpdateLegend(Legend newLegend) {
+	legend = newLegend;
+}
+
 void idPlayer::EvoUp() {
 	evoPoints = 0;
 	OnDamageEnemy(1);
@@ -4111,6 +4117,27 @@ void idPlayer::DoPassiveAbility(void) {
 		if (gameLocal.time % 1000 == 0) {
 			if (health < inventory.maxHealth) {
 				health += 1;
+			}
+		}
+	}
+	if (legend == LEGEND_VALKYRIE) {
+		if (physicsObj.IsWalking()) {
+			flightTime = 0;
+			if (flightFuel < maxFlightFuel) {
+				flightFuel++;
+			}
+		}
+
+		if (usercmd.upmove >= 1.0f && !pfl.jump) {
+			idVec3 vel = physicsObj.GetLinearVelocity();
+			if ((vel.z <= 0.0f && flightTime == 0) || flightTime > 0) {
+				vel.z = 100.0f;
+				physicsObj.SetLinearVelocity(vel * 0.99f);
+				flightTime++;
+				flightFuel--;
+			}
+			else if (flightTime > 0) {
+				flightTime--;
 			}
 		}
 	}

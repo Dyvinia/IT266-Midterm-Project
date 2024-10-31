@@ -328,6 +328,9 @@ public:
 	idVec3					sprintWeaponStance;
 
 	bool					hasDoubleJump;
+	int						flightTime;
+	int						flightFuel;
+	int						maxFlightFuel;
 
 	struct playerFlags_s {
 		bool		forward			:1;
@@ -455,6 +458,8 @@ public:
 
 							idPlayer();
 	virtual					~idPlayer();
+
+	void					UpdateLegend(Legend);
 
 	void					EvoUp( void );
 
