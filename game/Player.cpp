@@ -3436,7 +3436,7 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	assert ( _hud );
 
 	temp = _hud->State().GetInt("player_legend_int", "-1");
-	if (temp != health) {
+	if (temp != (int)legend) {
 		_hud->SetStateInt("player_legend_int", (int)legend);
 
 		if (legend == LEGEND_OCTANE) {
