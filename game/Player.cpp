@@ -8053,7 +8053,11 @@ void idPlayer::BobCycle( const idVec3 &pushVelocity ) {
 		if ( physicsObj.IsCrouching() && !isSliding) {
 			bobmove = pm_crouchbob.GetFloat();
 			// ducked characters never play footsteps
-		} else {
+		}
+		else if (isSliding) {
+			bobmove = 0.0f;
+		}
+		else {
 			// vary the bobbing based on the speed of the player
 			bobmove = pm_walkbob.GetFloat() * ( 1.0f - bobFrac ) + pm_runbob.GetFloat() * bobFrac;
 		}
@@ -9520,9 +9524,16 @@ void idPlayer::Move( void ) {
 
 	float speed = physicsObj.GetLinearVelocity().ToVec2().Length();
 
+	// slide boost
 	if (physicsObj.IsWalking() && pfl.crouch && !wasCrouching) {
 		idVec3 vel = physicsObj.GetLinearVelocity();
 		if (speed > 220.0f) {
+			// cap the boost
+			if (vel.Length() > 450.0f) {
+				vel.Normalize();
+				vel *= 450.0f;
+			}
+
 			if (vel.z > 0.0f) {
 				vel.z = abs(vel.z) * -0.5f; // sliding shouldnt give a boost upwards
 			}
@@ -9530,28 +9541,19 @@ void idPlayer::Move( void ) {
 				vel.z = vel.z * 0.75f; // slightly reduce downwards velocity from slide
 			}
 			
-			float slideSpeedMult = 2.25f * speed / (200.0f * speedMult); // the faster you move while going into the slide, the faster the slide is
+			float slideSpeedMult = 2.0f * speed / (200.0f * speedMult); // the faster you move while going into the slide, the faster the slide is
 			physicsObj.SetLinearVelocity(vel * slideSpeedMult);
-			isSliding = true;
 		}
 	}
 
-	// if movement speed has reduced enough from slide, stop sliding
-	if (isSliding && speed < 175.0f) {
-		isSliding = false;
-	}
-
-	// if stopped crouching while sliding, stop sliding
-	if (isSliding && !pfl.crouch) {
-		isSliding = false;
-	}
-
 	// sliding has reduced friction
-	if (isSliding) {
-		pm_frictionoverride.SetFloat(2.0f);
+	if (pfl.crouch && physicsObj.IsWalking() && speed > 175.0f) {
+		pm_frictionoverride.SetFloat(1.5f);
+		isSliding = true;
 	}
 	else {
 		pm_frictionoverride.SetFloat(-1.0f);
+		isSliding = false;
 	}
 
 	wasCrouching = pfl.crouch;
