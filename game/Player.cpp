@@ -11040,9 +11040,9 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 	angles.yaw		= scale * bobfracsin * 0.01f + g_gun_yaw.GetFloat();
 	angles.pitch	= xyspeed * bobfracsin * 0.005f + g_gun_pitch.GetFloat();
 
-	// apply ease in/out to the factors (formula is 3x^2 - 2x^3)
-	float sprintFracEase = (3 * pow(sprintFrac, 2)) - (2 * pow(sprintFrac, 3));
-	float crouchFracEase =  (3 * pow(crouchFrac, 2)) - (2 * pow(crouchFrac, 3));
+	// apply cubic(?) ease in/out to the factors (formula is 10x^3 - 15x^4 + 6x^5)
+	float sprintFracEase = (10 * pow(sprintFrac, 3)) - (15 * pow(sprintFrac, 4)) + (6 * pow(sprintFrac, 5));
+	float crouchFracEase = (10 * pow(crouchFrac, 3)) - (15 * pow(crouchFrac, 4)) + (6 * pow(crouchFrac, 5));
 
 	// gradually switch to sprint stance
 	if (sprintFrac > 0.0f) {
