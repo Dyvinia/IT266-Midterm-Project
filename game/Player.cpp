@@ -1169,6 +1169,7 @@ idPlayer::idPlayer() {
 	ultRefreshTime			= -1;
 	flightFuel				= 600;
 	maxFlightFuel			= 600;
+	currentDamageNumber		= 0;
 	attacking				= false;
 	wasCrouching			= false;
 	isSliding				= false;
@@ -3467,6 +3468,18 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		_hud->HandleNamedEvent ( "updateArmor" );
 	}
 
+	if (gameLocal.time - lastDamageNumberUpdate <= 2000) {
+		float time = (float)(gameLocal.time - lastDamageNumberUpdate)/2000.0f;
+		time = pow(time, 10);
+		hud->SetStateFloat("player_damage_trns", 1.0 - time);
+	}
+
+	if (gameLocal.time - lastDamageNumberUpdate >= 2000 && currentDamageNumber > 0) {
+		currentDamageNumber = 0;
+		hud->SetStateString("player_damaging", "");
+		hud->HandleNamedEvent("updateDamage");
+	}
+
 	if (gameLocal.time < tacDurationTime) {
 		float duration = (float)(tacDurationTime - gameLocal.time) / (float)(tacDurationTime - tacStartTime);
 		_hud->SetStateFloat("player_tacpct", duration);
@@ -4134,6 +4147,14 @@ void idPlayer::OnDamageEnemy(int damage) {
 			inventory.maxarmor = 100;
 			evoPoints = 1500;
 		}
+	}
+
+	currentDamageNumber += damage;
+	lastDamageNumberUpdate = gameLocal.time;
+
+	if (hud) {
+		hud->SetStateInt("player_damaging", currentDamageNumber);
+		hud->HandleNamedEvent("updateDamage");
 	}
 }
 

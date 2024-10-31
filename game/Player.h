@@ -299,6 +299,9 @@ public:
 	int						evoLevel;
 	int						evoPoints;
 
+	int						currentDamageNumber;
+	int						lastDamageNumberUpdate;
+
 	int						nextRocketTime;
 
 	friend class idThread;

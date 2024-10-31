@@ -667,9 +667,9 @@ windowDef Desktop
 		}
 		windowDef health_amount
 		{
-			rect	356,-428,52,26
+			rect	356,426,52,26
 			visible	1
-			forecolor	0.866,0.921,0.764,1
+			forecolor	0.862,0.917,0.760,0
 			text	"gui::player_health"
 			textscale	0.5
 			font	"fonts/chain"
@@ -854,6 +854,31 @@ windowDef Desktop
 			shear	0,-.22
 			notime	1
 			font	"fonts/marine"
+		}
+		windowDef damage_value_text
+		{
+			rect	295,260,50,26
+			visible	1
+			forecolor	0.8,0.8,0.8,("gui::player_damage_trns")
+			text	"gui::player_damaging"
+			textscale	0.32
+			font	"fonts/chain"
+			shear	0,0
+			notime	1
+			textalign	1
+
+			onInit {
+				namedEvent "updateDamage";
+			}
+
+			onNamedEvent updateDamage {
+				resettime "damage_value_text" "0";
+			}
+
+			onTime 0 {
+				transition "textscale" "0.4" "0.32" "250" ;
+			}
+
 		}
 	}
 	windowDef p_ammo_mp
