@@ -2121,6 +2121,8 @@ void idPlayer::Save( idSaveGame *savefile ) const {
 	savefile->WriteInt(inventory.armor);
 	savefile->WriteInt(inventory.maxarmor);
 
+	savefile->WriteInt(legend);
+
 	savefile->WriteBool( noclip );
 	savefile->WriteBool( godmode );
 	savefile->WriteInt ( godmodeDamage );	
@@ -2387,6 +2389,10 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 	savefile->ReadInt( evoLevel );
 	savefile->ReadInt( inventory.armor );
 	savefile->ReadInt(inventory.maxarmor);
+
+	int leg = 0;
+	savefile->ReadInt(leg);
+	legend = (idPlayer::Legend)leg;
 
 	savefile->ReadBool(noclip);
 	savefile->ReadBool( godmode );
@@ -12764,6 +12770,7 @@ void idPlayer::WriteToSnapshot( idBitMsgDelta &msg ) const {
 	msg.WriteDeltaFloat( 0.0f, deltaViewAngles[1] );
 	msg.WriteDeltaFloat( 0.0f, deltaViewAngles[2] );
 	msg.WriteShort( health );
+	msg.WriteShort( legend );
 	msg.WriteShort( evoPoints );
 	msg.WriteShort( evoLevel );
 	msg.WriteByte( inventory.armor );
@@ -12825,6 +12832,7 @@ void idPlayer::ReadFromSnapshot( const idBitMsgDelta &msg ) {
 	deltaViewAngles[1] = msg.ReadDeltaFloat( 0.0f );
 	deltaViewAngles[2] = msg.ReadDeltaFloat( 0.0f );
 	health = msg.ReadShort();
+	legend = (idPlayer::Legend)msg.ReadShort();
 	evoPoints = msg.ReadShort();
 	evoLevel = msg.ReadShort();
 	inventory.armor = msg.ReadByte();
