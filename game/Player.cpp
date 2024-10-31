@@ -4060,6 +4060,11 @@ void idPlayer::StopFiring( void ) {
 	}
 }
 
+void idPlayer::EvoUp() {
+	evoPoints = 0;
+	OnDamageEnemy(1);
+}
+
 /*
 ===============
 idPlayer::OnDamageEnemy
@@ -4068,7 +4073,7 @@ idPlayer::OnDamageEnemy
 void idPlayer::OnDamageEnemy(int damage) {
 	evoPoints -= damage;
 
-	if (evoPoints < 0) {
+	if (evoPoints <= 0) {
 		evoPoints = 0;
 		if (evoLevel < 3) {
 			evoLevel++;
@@ -4091,7 +4096,7 @@ void idPlayer::OnDamageEnemy(int damage) {
 
 		if (evoLevel == 3) {
 			inventory.maxarmor = 100;
-			evoPoints = 1000;
+			evoPoints = 1500;
 		}
 	}
 }

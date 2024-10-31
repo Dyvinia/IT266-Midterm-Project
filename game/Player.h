@@ -456,6 +456,8 @@ public:
 							idPlayer();
 	virtual					~idPlayer();
 
+	void					EvoUp( void );
+
 	void					OnDamageEnemy( int );
 
 	void					Spawn( void );

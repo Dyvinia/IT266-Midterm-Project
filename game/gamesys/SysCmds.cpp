@@ -627,6 +627,17 @@ void Cmd_UltAbility_f(const idCmdArgs& args) {
 	player->UltimateAbility();
 }
 
+void Cmd_EvoUp_f(const idCmdArgs& args) {
+	idPlayer* player;
+
+	player = gameLocal.GetLocalPlayer();
+	if (!player) {
+		return;
+	}
+
+	player->EvoUp();
+}
+
 /*
 ==================
 Cmd_Undying_f
@@ -3075,8 +3086,9 @@ void idGameLocal::InitConsoleCommands( void ) {
 //	cmdSystem->AddCommand( "writeGameState",		WriteGameState_f,			CMD_FL_GAME,				"write game state" );
 //	cmdSystem->AddCommand( "testSaveGame",			TestSaveGame_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"test a save game for a level" );
 // RAVEN END
-	cmdSystem->AddCommand( "tactical",				Cmd_TacAbility_f,					CMD_FL_GAME,				"tactical ability" );
-	cmdSystem->AddCommand( "ultimate",				Cmd_UltAbility_f,					CMD_FL_GAME,				"tactical ability" );
+	cmdSystem->AddCommand( "evoup",					Cmd_EvoUp_f,				CMD_FL_GAME,				"level up evo");
+	cmdSystem->AddCommand( "tactical",				Cmd_TacAbility_f,			CMD_FL_GAME,				"tactical ability" );
+	cmdSystem->AddCommand( "ultimate",				Cmd_UltAbility_f,			CMD_FL_GAME,				"tactical ability" );
 	cmdSystem->AddCommand( "game_memory",			idClass::DisplayInfo_f,		CMD_FL_GAME,				"displays game class info" );
 	cmdSystem->AddCommand( "listClasses",			idClass::ListClasses_f,		CMD_FL_GAME,				"lists game classes" );
 	cmdSystem->AddCommand( "listThreads",			idThread::ListThreads_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"lists script threads" );
