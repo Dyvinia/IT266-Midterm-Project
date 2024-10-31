@@ -716,14 +716,14 @@ windowDef Desktop
 		}
 		windowDef icon_health
 		{
-			rect	12,414,16,16
+			rect	143,414,16,16
 			visible	1
 			background	"gfx/guis/hud/icons/item_health"
 			matcolor	0.309,0.725,0.6,0.6
 		}
 		windowDef icon_armor
 		{
-			rect	30,414,16,16
+			rect	160,414,16,16
 			visible	1
 			background	"gfx/guis/hud/icons/item_armor"
 			matcolor	( "gui::player_armorcolor_r"),( "gui::player_armorcolor_g"),( "gui::player_armorcolor_b"),0.6
@@ -843,6 +843,17 @@ windowDef Desktop
 			visible	("gui::player_fuelvisible")
 			shear	0,0
 			backcolor	1,1,1,1
+		}
+		windowDef legend_text
+		{
+			rect	13,410,152,26
+			visible	1
+			forecolor	0.8,0.847,0.690,1
+			text	"gui::player_legend"
+			textscale	0.32
+			shear	0,-.22
+			notime	1
+			font	"fonts/marine"
 		}
 	}
 	windowDef p_ammo_mp

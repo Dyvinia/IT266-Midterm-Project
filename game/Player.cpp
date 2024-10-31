@@ -3435,6 +3435,21 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	
 	assert ( _hud );
 
+	temp = _hud->State().GetInt("player_legend_int", "-1");
+	if (temp != health) {
+		_hud->SetStateInt("player_legend_int", (int)legend);
+
+		if (legend == LEGEND_OCTANE) {
+			_hud->SetStateString("player_legend", "Octane");
+		}
+		else if (legend == LEGEND_VALKYRIE) {
+			_hud->SetStateString("player_legend", "Valkyrie");
+		}
+		else {
+			_hud->SetStateString("player_legend", "");
+		}
+	}
+
 	temp = _hud->State().GetInt ( "player_health", "-1" );
 	if ( temp != health ) {		
 		_hud->SetStateInt   ( "player_healthDelta", temp == -1 ? 0 : (temp - health) );
