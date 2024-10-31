@@ -3445,6 +3445,9 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		if (legend == LEGEND_OCTANE) {
 			_hud->SetStateString("player_legend", "Octane");
 		}
+		else if (legend == LEGEND_REVENANT) {
+			_hud->SetStateString("player_legend", "Revenant");
+		}
 		else if (legend == LEGEND_VALKYRIE) {
 			_hud->SetStateString("player_legend", "Valkyrie");
 		}
@@ -4274,6 +4277,18 @@ void idPlayer::TacticalAbility(void) {
 		}
 		tacActive = true;
 	}
+	if (legend == LEGEND_REVENANT) {
+		duration = 0.1;
+		cooldown = 5;
+		idVec3 dir = firstPersonViewAxis[0];
+		if (dir.z < 0.0f) {
+			dir.z = (1.0f + dir.z / 2.0f);
+		}
+		else {
+			dir.z = 1;
+		}
+		physicsObj.SetLinearVelocity(dir * 600.0f);
+	}
 	if (legend == LEGEND_VALKYRIE) {
 		duration = 1;
 		cooldown = 10;
@@ -4348,6 +4363,7 @@ void idPlayer::UltimateAbility(void) {
 		duration = 0.1;
 		cooldown = 5;
 		idVec3 vel = physicsObj.GetLinearVelocity();
+		vel.Normalize();
 		vel.z = 250.0f;
 		physicsObj.SetLinearVelocity(vel * 3.0f);
 		hasDoubleJump = true;

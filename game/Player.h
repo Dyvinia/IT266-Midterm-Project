@@ -281,8 +281,8 @@ public:
  	};
 
 	enum Legend {
-		LEGEND_HORIZON,
 		LEGEND_OCTANE,
+		LEGEND_REVENANT,
 		LEGEND_VALKYRIE
 	};
 
