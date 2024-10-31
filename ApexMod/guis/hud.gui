@@ -18,6 +18,7 @@ windowDef Desktop
 	definevec4	"healthicon_mp"	0.980,0.168,0.0196,0.8
 	definevec4	"armoricon_mp"	0.968,0.752,0.0156,0.8
 	definevec4	"white"	1,1,1,1
+	definevec4	"transparent"	0,0,0,0
 	float	"objdone"	0
 	float	"weapswitch"	0
 	float	"teamstrogg"	0
@@ -27,6 +28,7 @@ windowDef Desktop
 	definefloat	"switchLeft"	(640-((gui::weaponcount*30)-2
 
 	onInit {
+		namedEvent "updateOverlay";
 		namedEvent "updateHealth";
 		namedEvent "updateArmor";
 		namedEvent "updateAmmo";		
@@ -432,6 +434,22 @@ windowDef Desktop
 		set "ViewComments::visible" "0";
 	}
 
+	windowDef armorOverlay
+	{
+		rect	0,0,640,480
+		visible	1
+		background	"gfx/guis/hud/vignette"
+		matcolor	0,0,0,1
+
+		onNamedEvent updateOverlay {
+			resettime "armorOverlay" "0";
+		}
+
+		onTime 0 {
+			transition "armorOverlay::matcolor" "$health_val_new1::backcolor" "$desktop::transparent" "500" ;
+		}
+
+	}
 	windowDef speed
 	{
 		rect	550,70,80,20

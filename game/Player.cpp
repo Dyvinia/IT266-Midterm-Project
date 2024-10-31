@@ -3503,6 +3503,9 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 			_hud->SetStateFloat("player_armorpct", idMath::ClampFloat(0.0f, 1.0f, (float)inventory.armor / 100.0f));
 			_hud->SetStateFloat("player_armortotalpct", idMath::ClampFloat(0.0f, 1.0f, (float)inventory.maxarmor / 100.0f));
 			_hud->HandleNamedEvent("updateArmor");
+			if (evoLevel > 0) {
+				_hud->HandleNamedEvent("updateOverlay");
+			}
 		}
 	}
 	
@@ -4133,6 +4136,9 @@ void idPlayer::TacticalAbility(void) {
 			health -= 20;
 		}
 		StartSound("snd_pain_large", SND_CHANNEL_VOICE, 0, false, NULL);
+		if (hud) {
+			hud->HandleNamedEvent("updateOverlay");
+		}
 	}
 
 	tacStartTime = gameLocal.time;
