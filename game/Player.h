@@ -327,6 +327,8 @@ public:
 	idVec3					defaultSprintWeaponStance;
 	idVec3					sprintWeaponStance;
 
+	bool					hasDoubleJump;
+
 	struct playerFlags_s {
 		bool		forward			:1;
 		bool		backward		:1;

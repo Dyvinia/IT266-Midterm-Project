@@ -1158,6 +1158,8 @@ idPlayer::idPlayer() {
 	inventory.armor			= 0;
 	inventory.maxarmor		= 0;
 
+	hasDoubleJump			= false;
+
 	bobFoot					= 0;
 	bobFrac					= 0.0f;
 	speedMult				= 1.0f;
@@ -4176,6 +4178,7 @@ void idPlayer::UltimateAbility(void) {
 		idVec3 vel = physicsObj.GetLinearVelocity();
 		vel.z = 250.0f;
 		physicsObj.SetLinearVelocity(vel * 3.0f);
+		hasDoubleJump = true;
 	}
 
 	ultStartTime = gameLocal.time;
@@ -9358,6 +9361,13 @@ void idPlayer::Move( void ) {
 	}
 
 	wasCrouching = pfl.crouch;
+
+	if (usercmd.upmove >= 1.0f && !pfl.jump && hasDoubleJump) {
+		idVec3 vel = physicsObj.GetLinearVelocity();
+		vel.z = 250.0f;
+		physicsObj.SetLinearVelocity(vel * 1.5f);
+		hasDoubleJump = false;
+	}
 
 	if ( pfl.jump ) {
 		loggedAccel_t	*acc = &loggedAccel[currentLoggedAccel&(NUM_LOGGED_ACCELS-1)];
