@@ -4160,14 +4160,22 @@ void idPlayer::DoPassiveAbility(void) {
 		if (usercmd.upmove >= 1.0f && !pfl.jump) {
 			idVec3 vel = physicsObj.GetLinearVelocity();
 			if (((vel.z <= 0.0f && flightTime == 0) || flightTime > 0) && flightFuel > 0) {
-				vel.z = 100.0f;
-				physicsObj.SetLinearVelocity(vel * 0.99f);
+				vel.z = ((float)flightTime)/2.0f + 50.0f;
+				if (vel.z > 100.0f) {
+					vel.z = 100.0f;
+				}
+				physicsObj.SetLinearVelocity(vel * 0.975f);
+				if (flightTime == 0) {
+					flightFuel -= 30;
+				}
+				else {
+					flightFuel -= 2;
+				}
 				flightTime++;
-				flightFuel -= 2;
-			}
-			else if (flightTime > 0) {
-				flightTime--;
-			}
+			}	
+		}
+		else if (flightTime > 0) {
+			flightTime = 0;
 		}
 	}
 }
