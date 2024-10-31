@@ -359,7 +359,9 @@ entityDef projectile_rocket
 entityDef projectile_rocket_valk
 {
 	"inherit"					"projectile_rocket"
-	"size"						"1 1 1"
+	"size"						"4 4 4"
+
+	"speed"						"1600"
 	
 	"def_damage"				"damage_rocketDirect_valk"
 	"def_splash_damage"			"damage_rocketSplash_valk"
@@ -403,7 +405,7 @@ entityDef damage_rocketDirect
 
 entityDef damage_rocketDirect_valk 
 {
-	"damage"					"30"
+	"damage"					"35"
 	"push"						"45000"
 	"gib"						"1"
 
@@ -442,7 +444,7 @@ entityDef damage_rocketSplash
 
 entityDef damage_rocketSplash_valk 
 {
-	"damage"					"15"
+	"damage"					"20"
 	"radius"					"45"
 	"knockback"					"100"
 	"push"						"10000"

@@ -4191,22 +4191,52 @@ void idPlayer::DoPassiveAbility(void) {
 		if (usercmd.upmove >= 1.0f && !pfl.jump) {
 			idVec3 vel = physicsObj.GetLinearVelocity();
 			if (((vel.z <= 0.0f && flightTime == 0) || flightTime > 0) && flightFuel > 0) {
-				vel.z = ((float)flightTime)/0.5f + 50.0f;
-				if (vel.z > 150.0f) {
-					vel.z = 150.0f;
-				}
-				physicsObj.SetLinearVelocity(vel * 0.975f);
-				if (flightTime == 0) {
-					flightFuel -= 30;
+				if (gameLocal.time > ultDurationTime) {
+					vel.z = ((float)flightTime) / 0.5f + 50.0f;
+					if (vel.z > 150.0f) {
+						vel.z = 150.0f;
+					}
+
+					if (flightTime == 0) {
+						flightFuel -= 30;
+					}
+					else {
+						flightFuel -= 2;
+					}
 				}
 				else {
-					flightFuel -= 2;
+					vel.z = 40.0f;
 				}
 				flightTime++;
+				
+				physicsObj.SetLinearVelocity(vel * 0.975f);
 			}	
 		}
 		else if (flightTime > 0) {
 			flightTime = 0;
+		}
+
+
+		if ((usercmd.buttons & BUTTON_ATTACK) && gameLocal.time < ultDurationTime && gameLocal.time >= nextRocketTime) {
+			idDict	args;
+			idEntity* ent;
+			args.Set("classname", "projectile_rocket_valk");
+			args.SetInt("instance", GetInstance());
+
+			gameLocal.SpawnEntityDef(args, &ent, false);
+			idProjectile* proj = static_cast<idProjectile*>(ent);
+
+			float ang = idMath::Sin(0.075f * gameLocal.random.RandomFloat());
+			float spin = (float)DEG2RAD(360.0f) * gameLocal.random.RandomFloat();
+			idVec3 dir = firstPersonViewAxis[0] + firstPersonViewAxis[2] * (ang * idMath::Sin(spin)) - firstPersonViewAxis[1] * (ang * idMath::Cos(spin));
+			dir.Normalize();
+
+			proj->Create(this, firstPersonViewOrigin, dir, this);
+			proj->Launch(firstPersonViewOrigin + (rocketsFired % 2 == 0 ? (idVec3::idVec3(0.5, 12, 10)) : (idVec3::idVec3(0.5, -12, 10))) * firstPersonViewAxis, dir, idVec3::idVec3(0, 0, 0));
+
+			rocketsFired++;
+
+			nextRocketTime = gameLocal.time + 200;
 		}
 	}
 }
@@ -4246,7 +4276,7 @@ void idPlayer::TacticalAbility(void) {
 	}
 	if (legend == LEGEND_VALKYRIE) {
 		duration = 1;
-		cooldown = 12;
+		cooldown = 10;
 	}
 
 	nextRocketTime = gameLocal.time;
@@ -4262,7 +4292,7 @@ idPlayer::DoTacticalAbility
 */
 void idPlayer::DoTacticalAbility(void) {
 	if (legend == LEGEND_VALKYRIE) {
-		if (gameLocal.time < tacDurationTime && gameLocal.time >= nextRocketTime) {
+		if (gameLocal.time < tacDurationTime && gameLocal.time >= nextRocketTime && gameLocal.time > ultDurationTime) {
 			idDict	args;
 			idEntity* ent;
 			args.Set("classname", "projectile_rocket_valk");
@@ -4277,9 +4307,11 @@ void idPlayer::DoTacticalAbility(void) {
 			dir.Normalize();
 
 			proj->Create(this, firstPersonViewOrigin, dir, this);
-			proj->Launch(firstPersonViewOrigin + (idVec3::idVec3(0.5, 10, 8) * firstPersonViewAxis), dir, idVec3::idVec3(0, 0, 0));
+			proj->Launch(firstPersonViewOrigin + (idVec3::idVec3(0.5, 12, 10) * firstPersonViewAxis), dir, idVec3::idVec3(0, 0, 0));
 
-			nextRocketTime = gameLocal.time + 125;
+			rocketsFired++;
+
+			nextRocketTime = gameLocal.time + 100;
 		}
 	}
 }
@@ -4319,6 +4351,11 @@ void idPlayer::UltimateAbility(void) {
 		vel.z = 250.0f;
 		physicsObj.SetLinearVelocity(vel * 3.0f);
 		hasDoubleJump = true;
+	}
+	if (legend == LEGEND_VALKYRIE) {
+		duration = 10;
+		cooldown = 30;
+		nextRocketTime = gameLocal.time;
 	}
 
 	ultStartTime = gameLocal.time;
@@ -6478,7 +6515,7 @@ void idPlayer::Weapon_Combat( void ) {
 	// check for attack
 	pfl.weaponFired = false;
  	if ( !influenceActive ) {
- 		if ( ( usercmd.buttons & BUTTON_ATTACK ) && !weaponGone ) {
+ 		if ( ( usercmd.buttons & BUTTON_ATTACK ) && !weaponGone && (legend == LEGEND_VALKYRIE && gameLocal.time > ultDurationTime)) {
  			FireWeapon();
 			attacking = true;
  		} else if ( oldButtons & BUTTON_ATTACK ) {

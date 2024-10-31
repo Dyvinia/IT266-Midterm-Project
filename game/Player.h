@@ -306,6 +306,7 @@ public:
 	int						nextHealTime;
 
 	int						nextRocketTime;
+	int						rocketsFired;
 
 	friend class idThread;
 
