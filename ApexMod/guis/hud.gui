@@ -446,7 +446,7 @@ windowDef Desktop
 		}
 
 		onTime 0 {
-			transition "armorOverlay::matcolor" "$health_val_new1::backcolor" "$desktop::transparent" "500" ;
+			transition "armorOverlay::matcolor" "$health_val_new1::backcolor" "$desktop::transparent" "1000" ;
 		}
 
 	}
@@ -669,18 +669,18 @@ windowDef Desktop
 		{
 			rect	356,426,52,26
 			visible	1
-			forecolor	0.862,0.917,0.760,0
+			forecolor	0.858,0.913,0.756,0
 			text	"gui::player_health"
-			textscale	0.5
+			textscale	0
 			font	"fonts/chain"
 			shear	0,-.22
 			textalign	2
 			notime	1
 
 			onTime 0 {
-				transition "forecolor" "$desktop::white" "$desktop::typecolor" "250" ;
-				transition "rect" "$d_health_amount::rect" "$health_amount::rect" "250" ;
-				transition "textscale" "0.6" "0.5" "250" ;
+				//transition "forecolor" "$desktop::white" "$desktop::typecolor" "250" ;
+				//transition "rect" "$d_health_amount::rect" "$health_amount::rect" "250" ;
+				//transition "textscale" "0.6" "0.5" "250" ;
 				
 				transition "icon_health::matcolor" "$desktop::white" "$desktop::healthicon" "250" ;
 			}
