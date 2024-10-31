@@ -1165,7 +1165,7 @@ idPlayer::idPlayer() {
 	tacRefreshTime			= -1;
 	tacDurationTime			= -1;
 	ultRefreshTime			= -1;
-	attackIntent			= false;
+	attacking			= false;
 	wasCrouching			= false;
 	isSliding				= false;
 	isSprinting				= false;
@@ -6330,10 +6330,10 @@ void idPlayer::Weapon_Combat( void ) {
  	if ( !influenceActive ) {
  		if ( ( usercmd.buttons & BUTTON_ATTACK ) && !weaponGone ) {
  			FireWeapon();
-			attackIntent = true;
+			attacking = true;
  		} else if ( oldButtons & BUTTON_ATTACK ) {
  			pfl.attackHeld = false;
-			attackIntent = false;
+			attacking = false;
  			weapon->EndAttack();
  		}
  	}
@@ -8960,18 +8960,23 @@ idPlayer::AdjustSpeed
 void idPlayer::AdjustSpeed( void ) {
 	float speed;
 	isSprinting = false;
+
 	if ( spectating ) {
 		speed = pm_spectatespeed.GetFloat();
 		bobFrac = 0.0f;
-	} else if ( noclip ) {
+	}
+	else if ( noclip ) {
 		speed = pm_noclipspeed.GetFloat();
 		bobFrac = 0.0f;
 	}
+	// trying to sprint
 	else if (!physicsObj.OnLadder() && !(usercmd.buttons & BUTTON_RUN) && (usercmd.forwardmove > 0) && (usercmd.upmove >= 0)) {
-		if (attackIntent && zoomed) {
+		// attacking or zooming means walking
+		if (attacking || zoomed) {
 			bobFrac = 1.0f;
 			speed = pm_speed.GetFloat();
 		}
+		// sprinting
 		else {
 			speed = pm_sprintspeed.GetFloat();
 			bobFrac = 1.75f;
@@ -9315,9 +9320,14 @@ void idPlayer::Move( void ) {
 	if (physicsObj.IsWalking() && pfl.crouch && !wasCrouching) {
 		idVec3 vel = physicsObj.GetLinearVelocity();
 		if (speed > 220.0f) {
-			vel.z = abs(vel.z) * -0.75f; // sliding shouldnt give a boost upwards
-			float slideSpeedMult = 2.5f * speed / 200.0f; // the faster you move while going into the slide, the faster the slide is
-			slideSpeedMult /= speedMult; // prevent slide from going overboard from speed mult
+			if (vel.z > 0.0f) {
+				vel.z = abs(vel.z) * -0.5f; // sliding shouldnt give a boost upwards
+			}
+			else {
+				vel.z = vel.z * 0.75f; // slightly reduce downwards velocity from slide
+			}
+			
+			float slideSpeedMult = 2.25f * speed / (200.0f * speedMult); // the faster you move while going into the slide, the faster the slide is
 			physicsObj.SetLinearVelocity(vel * slideSpeedMult);
 			isSliding = true;
 		}
@@ -9620,7 +9630,7 @@ void idPlayer::Think( void ) {
 	}
 
 	// quickly slowly interpolate out of sprinting stance
-	if (attackIntent && sprintFrac > 0.0f) {
+	if (attacking && sprintFrac > 0.0f) {
 		sprintFrac -= 0.25f;
 	}
 	
@@ -10973,18 +10983,22 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 	angles.yaw		= scale * bobfracsin * 0.01f + g_gun_yaw.GetFloat();
 	angles.pitch	= xyspeed * bobfracsin * 0.005f + g_gun_pitch.GetFloat();
 
+	// apply ease in/out to the factors (formula is 3x^2 - 2x^3)
+	float sprintFracEase = (3 * pow(sprintFrac, 2)) - (2 * pow(sprintFrac, 3));
+	float crouchFracEase =  (3 * pow(crouchFrac, 2)) - (2 * pow(crouchFrac, 3));
+
 	// gradually switch to sprint stance
 	if (sprintFrac > 0.0f) {
-		angles.yaw += sprintWeaponStance.x * sprintFrac;
-		angles.pitch += sprintWeaponStance.y * sprintFrac;
-		angles.roll += sprintWeaponStance.z * sprintFrac;
+		angles.yaw += sprintWeaponStance.x * sprintFracEase;
+		angles.pitch += sprintWeaponStance.y * sprintFracEase;
+		angles.roll += sprintWeaponStance.z * sprintFracEase;
 	}
 
 	idVec3 crouchWeaponStance = idVec3::idVec3(-4.0f, 0.0f, -15.0f);
 	if (crouchFrac > 0.0f) {
-		angles.yaw += crouchWeaponStance.x * crouchFrac;
-		angles.pitch += crouchWeaponStance.y * crouchFrac;
-		angles.roll += crouchWeaponStance.z * crouchFrac;
+		angles.yaw += crouchWeaponStance.x * crouchFracEase;
+		angles.pitch += crouchWeaponStance.y * crouchFracEase;
+		angles.roll += crouchWeaponStance.z * crouchFracEase;
 	}
 	
 	angles += weapon->GetViewModelAngles();
