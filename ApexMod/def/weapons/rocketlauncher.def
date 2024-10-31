@@ -403,7 +403,7 @@ entityDef damage_rocketDirect
 
 entityDef damage_rocketDirect_valk 
 {
-	"damage"					"20"
+	"damage"					"25"
 	"push"						"45000"
 	"gib"						"1"
 
@@ -442,8 +442,8 @@ entityDef damage_rocketSplash
 
 entityDef damage_rocketSplash_valk 
 {
-	"damage"					"10"
-	"radius"					"10"
+	"damage"					"15"
+	"radius"					"15"
 	"knockback"					"100"
 	"push"						"10000"
 	"gib"						"0"

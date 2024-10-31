@@ -4089,6 +4089,7 @@ void idPlayer::StopFiring( void ) {
 }
 
 void idPlayer::UpdateLegend(Legend newLegend) {
+	EndTacticalAbility();
 	legend = newLegend;
 	if (hud) {
 		hud->HandleNamedEvent("updateOverlay");
@@ -4160,7 +4161,7 @@ void idPlayer::DoPassiveAbility(void) {
 		if (usercmd.upmove >= 1.0f && !pfl.jump) {
 			idVec3 vel = physicsObj.GetLinearVelocity();
 			if (((vel.z <= 0.0f && flightTime == 0) || flightTime > 0) && flightFuel > 0) {
-				vel.z = ((float)flightTime)/1.5f + 75.0f;
+				vel.z = ((float)flightTime)/0.5f + 50.0f;
 				if (vel.z > 150.0f) {
 					vel.z = 150.0f;
 				}
@@ -4190,8 +4191,8 @@ void idPlayer::TacticalAbility(void) {
 		return;
 	}
 
-	int duration = 0;
-	int cooldown = 0;
+	float duration = 0;
+	float cooldown = 0;
 
 	if (legend == LEGEND_OCTANE) {
 		duration = 5;
@@ -4220,8 +4221,8 @@ void idPlayer::TacticalAbility(void) {
 
 	nextRocketTime = gameLocal.time;
 	tacStartTime = gameLocal.time;
-	tacDurationTime = gameLocal.time + (duration * 1000);
-	tacRefreshTime = tacDurationTime + (cooldown * 1000);
+	tacDurationTime = gameLocal.time + (int)(duration * 1000);
+	tacRefreshTime = tacDurationTime + (int)(cooldown * 1000);
 }
 
 /*
@@ -4231,21 +4232,23 @@ idPlayer::DoTacticalAbility
 */
 void idPlayer::DoTacticalAbility(void) {
 	if (legend == LEGEND_VALKYRIE) {
-		int roundedTime = (((gameLocal.time - tacStartTime)/10)*10);
 		if (gameLocal.time < tacDurationTime && gameLocal.time >= nextRocketTime) {
-			float ang = idMath::Sin(0.15f * gameLocal.random.RandomFloat());
-			float spin = (float)DEG2RAD(360.0f) * gameLocal.random.RandomFloat();
-			idVec3 dir = firstPersonViewAxis[0] + firstPersonViewAxis[2] * (ang * idMath::Sin(spin)) - firstPersonViewAxis[1] * (ang * idMath::Cos(spin));
-			dir.Normalize();
 			idDict	args;
 			idEntity* ent;
 			args.Set("classname", "projectile_rocket_valk");
 			args.SetInt("instance", GetInstance());
+
 			gameLocal.SpawnEntityDef(args, &ent, false);
 			idProjectile* proj = static_cast<idProjectile*>(ent);
 
+			float ang = idMath::Sin(0.15f * gameLocal.random.RandomFloat());
+			float spin = (float)DEG2RAD(360.0f) * gameLocal.random.RandomFloat();
+			idVec3 dir = firstPersonViewAxis[0] + firstPersonViewAxis[2] * (ang * idMath::Sin(spin)) - firstPersonViewAxis[1] * (ang * idMath::Cos(spin));
+			dir.Normalize();
+
 			proj->Create(this, firstPersonViewOrigin, dir, this);
 			proj->Launch(firstPersonViewOrigin + (idVec3::idVec3(0.5, 10, 8) * firstPersonViewAxis), dir, idVec3::idVec3(0, 0, 0));
+
 			nextRocketTime = gameLocal.time + 125;
 		}
 	}
