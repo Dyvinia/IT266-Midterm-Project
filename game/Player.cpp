@@ -6515,7 +6515,7 @@ void idPlayer::Weapon_Combat( void ) {
 	// check for attack
 	pfl.weaponFired = false;
  	if ( !influenceActive ) {
- 		if ( ( usercmd.buttons & BUTTON_ATTACK ) && !weaponGone && (legend == LEGEND_VALKYRIE && gameLocal.time > ultDurationTime)) {
+		if ((usercmd.buttons & BUTTON_ATTACK) && !weaponGone && !(legend == LEGEND_VALKYRIE && gameLocal.time < ultDurationTime)) {
  			FireWeapon();
 			attacking = true;
  		} else if ( oldButtons & BUTTON_ATTACK ) {
