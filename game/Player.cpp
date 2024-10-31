@@ -1167,8 +1167,8 @@ idPlayer::idPlayer() {
 	tacRefreshTime			= -1;
 	tacDurationTime			= -1;
 	ultRefreshTime			= -1;
-	flightFuel				= 500;
-	maxFlightFuel			= 500;
+	flightFuel				= 600;
+	maxFlightFuel			= 600;
 	attacking				= false;
 	wasCrouching			= false;
 	isSliding				= false;
@@ -4090,6 +4090,9 @@ void idPlayer::StopFiring( void ) {
 
 void idPlayer::UpdateLegend(Legend newLegend) {
 	legend = newLegend;
+	if (hud) {
+		hud->HandleNamedEvent("updateOverlay");
+	}
 }
 
 void idPlayer::EvoUp() {
@@ -4160,7 +4163,7 @@ void idPlayer::DoPassiveAbility(void) {
 				vel.z = 100.0f;
 				physicsObj.SetLinearVelocity(vel * 0.99f);
 				flightTime++;
-				flightFuel--;
+				flightFuel -= 2;
 			}
 			else if (flightTime > 0) {
 				flightTime--;

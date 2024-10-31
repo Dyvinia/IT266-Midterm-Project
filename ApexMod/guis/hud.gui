@@ -667,7 +667,7 @@ windowDef Desktop
 		}
 		windowDef health_amount
 		{
-			rect	356,429,52,26
+			rect	356,-428,52,26
 			visible	1
 			forecolor	0.866,0.921,0.764,1
 			text	"gui::player_health"
@@ -824,7 +824,7 @@ windowDef Desktop
 		}
 		windowDef fuel_backbar
 		{
-			rect	15,75,40,275
+			rect	15,75,30,275
 			visible	("gui::player_fuelvisible")
 			background	"gfx/guis/hud/backbar"
 			matcolor	0,0,0,0.5
@@ -832,17 +832,17 @@ windowDef Desktop
 		}
 		windowDef fuel_backblack
 		{
-			rect	25,127,20,168
+			rect	22,127,16,168
 			visible	("gui::player_fuelvisible")
 			shear	0,0
 			backcolor	0,0,0,1
 		}
 		windowDef fuel_val
 		{
-			rect	25,295 - ( "gui::player_fuelpct" * 168 ),20,( "gui::player_fuelpct" * 168 )
+			rect	22,295 - ( "gui::player_fuelpct" * 168 ),16,( "gui::player_fuelpct" * 168 )
 			visible	("gui::player_fuelvisible")
 			shear	0,0
-			backcolor	1,1,1,1
+			backcolor	1,1,1,0.75
 		}
 		windowDef legend_text
 		{
