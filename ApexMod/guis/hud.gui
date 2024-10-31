@@ -439,7 +439,7 @@ windowDef Desktop
 		rect	0,0,640,480
 		visible	1
 		background	"gfx/guis/hud/vignette"
-		matcolor	0,0,0,1
+		matcolor	0,0,0,0
 
 		onNamedEvent updateOverlay {
 			resettime "armorOverlay" "0";
@@ -821,6 +821,28 @@ windowDef Desktop
 			shear	0,-.22
 			notime	1
 			font	"fonts/marine"
+		}
+		windowDef fuel_backbar
+		{
+			rect	15,75,40,275
+			visible	("gui::player_fuelvisible")
+			background	"gfx/guis/hud/backbar"
+			matcolor	0,0,0,0.5
+			shear	0,0
+		}
+		windowDef fuel_backblack
+		{
+			rect	25,127,20,168
+			visible	("gui::player_fuelvisible")
+			shear	0,0
+			backcolor	0,0,0,1
+		}
+		windowDef fuel_val
+		{
+			rect	25,295 - ( "gui::player_fuelpct" * 168 ),20,( "gui::player_fuelpct" * 168 )
+			visible	("gui::player_fuelvisible")
+			shear	0,0
+			backcolor	1,1,1,1
 		}
 	}
 	windowDef p_ammo_mp

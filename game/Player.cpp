@@ -1167,8 +1167,8 @@ idPlayer::idPlayer() {
 	tacRefreshTime			= -1;
 	tacDurationTime			= -1;
 	ultRefreshTime			= -1;
-	flightFuel				= 1000;
-	maxFlightFuel			= 1000;
+	flightFuel				= 500;
+	maxFlightFuel			= 500;
 	attacking				= false;
 	wasCrouching			= false;
 	isSliding				= false;
@@ -3472,6 +3472,9 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		_hud->SetStateString("player_ult_text", "Z");
 	}
 
+	_hud->SetStateFloat("player_fuelpct", idMath::ClampFloat(0.0f, 1.0f, (float)flightFuel / (float)maxFlightFuel));
+	_hud->SetStateInt("player_fuelvisible", legend == LEGEND_VALKYRIE ? 1 : 0);
+
 	temp = _hud->State().GetInt("player_evo", "-1");
 	if (temp != evoPoints) {
 		_hud->HandleNamedEvent("updateEvoPoints");
@@ -4130,7 +4133,7 @@ void idPlayer::DoPassiveAbility(void) {
 
 		if (usercmd.upmove >= 1.0f && !pfl.jump) {
 			idVec3 vel = physicsObj.GetLinearVelocity();
-			if ((vel.z <= 0.0f && flightTime == 0) || flightTime > 0) {
+			if (((vel.z <= 0.0f && flightTime == 0) || flightTime > 0) && flightFuel > 0) {
 				vel.z = 100.0f;
 				physicsObj.SetLinearVelocity(vel * 0.99f);
 				flightTime++;
