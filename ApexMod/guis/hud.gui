@@ -2437,4 +2437,15 @@ windowDef Desktop
 		}
 
 	}
+	windowDef help
+	{
+		rect	0,0,640,480
+		visible	("gui::player_helpvisible")
+		forecolor	1,1,1,1
+		text	"\n\nThis mod adds various things from Apex Legends.\n\nLegends:\nOctane - [oct | octane]\nPassive: Healing    Tactical [Q]: Stim    Ultimate [Z]: Jump Pad\n\nRevenant - [rev | revenant]\nPassive: Stalker    Tactical [Q]: Pounce    Ultimate [Z]: Forged Shadows\n\nValkyrie - [valk | valkyrie]\nPassive: Jetpack    Tactical [Q]: Missile Swarm    Ultimate [Z]: Flight Core\n\nMovement:\nSprinting [Shift]\nPressing Shift while walking forwards allows you to sprint\nSliding [Ctrl]\nPressing Crouch while sprinting lets you slide\nGrenade Throw [G]\nPressing G will throw a grenade (5 second cooldown)\n\nEvo Armor:\nDoing damage will level up your armor (you start off at level 0)\nWhen you are at full health, your armor passively regenerates slowly\nLevel 0 - 0 Armor | Level 1 - 50 Armor | Level 2 - 75 Armor | Level 3 - 100 Armor\n\nPress [P] to Open and Close this window"
+		textscale	0.22
+		font	"fonts/lowpixel"
+		backcolor	0,0,0,0.75
+		textalign	1
+	}
 }

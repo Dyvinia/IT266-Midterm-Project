@@ -627,6 +627,19 @@ void Cmd_UltAbility_f(const idCmdArgs& args) {
 	player->UltimateAbility();
 }
 
+void Cmd_Help_f(const idCmdArgs& args) {
+	idPlayer* player;
+
+	player = gameLocal.GetLocalPlayer();
+	if (!player) {
+		return;
+	}
+
+	idUserInterface* hud = player->hud;
+	bool isHelpVisible = hud->State().GetInt("player_helpvisible", "0");
+	hud->SetStateInt("player_helpvisible", !isHelpVisible);
+}
+
 void Cmd_EvoUp_f(const idCmdArgs& args) {
 	idPlayer* player;
 
@@ -3145,6 +3158,8 @@ void idGameLocal::InitConsoleCommands( void ) {
 
 	cmdSystem->AddCommand( "tactical",				Cmd_TacAbility_f,			CMD_FL_GAME,				"tactical ability" );
 	cmdSystem->AddCommand( "ultimate",				Cmd_UltAbility_f,			CMD_FL_GAME,				"tactical ability" );
+
+	cmdSystem->AddCommand( "apexhelp",				Cmd_Help_f,					CMD_FL_GAME,			"help" );
 
 	cmdSystem->AddCommand( "game_memory",			idClass::DisplayInfo_f,		CMD_FL_GAME,				"displays game class info" );
 	cmdSystem->AddCommand( "listClasses",			idClass::ListClasses_f,		CMD_FL_GAME,				"lists game classes" );
