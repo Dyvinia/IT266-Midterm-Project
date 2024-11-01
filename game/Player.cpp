@@ -4144,6 +4144,7 @@ void idPlayer::ThrowGrenade() {
 	float ang = idMath::Sin(0.075f * gameLocal.random.RandomFloat());
 	float spin = (float)DEG2RAD(360.0f) * gameLocal.random.RandomFloat();
 	idVec3 dir = firstPersonViewAxis[0] + firstPersonViewAxis[2] * (ang * idMath::Sin(spin)) - firstPersonViewAxis[1] * (ang * idMath::Cos(spin));
+	dir.z += 0.25f;
 	dir.Normalize();
 
 	proj->Create(this, firstPersonViewOrigin, dir, this);
@@ -4189,11 +4190,11 @@ void idPlayer::OnDamageEnemy(int damage) {
 	}
 
 	currentDamageNumber += damage;
-	lastDamageNumberUpdate = gameLocal.time;
 
-	if (hud) {
+	if (hud && damage > 0 && currentDamageNumber > 0) {
 		hud->SetStateInt("player_damaging", currentDamageNumber);
 		hud->HandleNamedEvent("updateDamage");
+		lastDamageNumberUpdate = gameLocal.time;
 	}
 }
 
