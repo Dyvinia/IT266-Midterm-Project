@@ -1168,6 +1168,8 @@ idPlayer::idPlayer() {
 	tacDurationTime			= -1;
 	ultRefreshTime			= -1;
 	ultDurationTime			= -1;
+	grenadeThrownTime		= -1;
+	grenadeRefreshTime		= -1;
 	flightFuel				= 600;
 	maxFlightFuel			= 600;
 	currentDamageNumber		= 0;
@@ -4124,6 +4126,31 @@ void idPlayer::UpdateLegend(Legend newLegend) {
 void idPlayer::EvoUp() {
 	evoPoints = 0;
 	OnDamageEnemy(1);
+}
+
+void idPlayer::ThrowGrenade() {
+	if (gameLocal.time < grenadeRefreshTime) {
+		return;
+	}
+
+	idDict	args;
+	idEntity* ent;
+	args.Set("classname", "projectile_grenade_thrown");
+	args.SetInt("instance", GetInstance());
+
+	gameLocal.SpawnEntityDef(args, &ent, false);
+	idProjectile* proj = static_cast<idProjectile*>(ent);
+
+	float ang = idMath::Sin(0.075f * gameLocal.random.RandomFloat());
+	float spin = (float)DEG2RAD(360.0f) * gameLocal.random.RandomFloat();
+	idVec3 dir = firstPersonViewAxis[0] + firstPersonViewAxis[2] * (ang * idMath::Sin(spin)) - firstPersonViewAxis[1] * (ang * idMath::Cos(spin));
+	dir.Normalize();
+
+	proj->Create(this, firstPersonViewOrigin, dir, this);
+	proj->Launch(firstPersonViewOrigin + (idVec3::idVec3(0, 12, 1)) * firstPersonViewAxis, dir, idVec3::idVec3(0, 0, 0));
+
+	grenadeThrownTime = gameLocal.time;
+	grenadeRefreshTime = gameLocal.time + 5000;
 }
 
 /*

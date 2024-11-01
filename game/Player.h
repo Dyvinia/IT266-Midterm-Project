@@ -297,6 +297,9 @@ public:
 	int						ultDurationTime;
 	int						ultRefreshTime;
 
+	int						grenadeThrownTime;
+	int						grenadeRefreshTime;
+
 	int						evoLevel;
 	int						evoPoints;
 
@@ -841,6 +844,8 @@ public:
 	void					SetCash( float newCashAmount );
 	void					ResetCash();
 // RITUAL END
+
+	void					ThrowGrenade(void);
 
 	void					DoPassiveAbility(void);
 	void					TacticalAbility(void);
