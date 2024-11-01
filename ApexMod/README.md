@@ -37,3 +37,20 @@ Doing damage will level up your armor (you start off at level 0). When you are a
 - Level 1 - 50 Armor
 - Level 2 - 75 Armor
 - Level 3 - 100 Armor
+
+# Added Controls
+- `P`: Help
+- `Shift`: Sprint
+- `G`: Grenade
+- `Q`: Tactical Ability
+- `Z`: Ultimate Ability
+
+# Added Commands
+- `oct` or `octane`: Changes current legend to Octane
+- `rev` or `revenant`: Changes current legend to Revenant
+- `valk` or `valkyrie`: Changes current legend to Valkyrie
+- `evoup`: Levels up evo armor
+- `grenade`: Throws grenade
+- `tactical`: Tactical ability
+- `ultimate`: Ultimate ability
+- `apexhelp`: Help screen
