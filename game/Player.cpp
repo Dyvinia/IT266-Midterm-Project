@@ -9261,7 +9261,12 @@ void idPlayer::AdjustSpeed( void ) {
 		speed *= 0.33f;
 	}
 
-	physicsObj.SetSpeed( speed, pm_crouchspeed.GetFloat() );
+	float crouchSpeed = pm_crouchspeed.GetFloat();
+	if (legend == LEGEND_REVENANT) {
+		crouchSpeed = pm_speed.GetFloat();
+	}
+
+	physicsObj.SetSpeed(speed, crouchSpeed);
 }
 
 /*
